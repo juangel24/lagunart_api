@@ -9,7 +9,7 @@ class ArtworksSchema extends Schema {
       table.increments()
       table.string('tittle',100).notNullable()
       table.text('description')
-      table.integer('art_subcategories').unsigned().references('id').inTable('art_subcategories').notNullable()
+      table.integer('art_subcategory_id').unsigned().references('id').inTable('art_subcategories').notNullable()
       table.boolean('is_adult_content')
       table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
       table.integer('views')

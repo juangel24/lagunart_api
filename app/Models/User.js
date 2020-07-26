@@ -34,6 +34,30 @@ class User extends Model {
   tokens () {
     return this.hasMany('App/Models/Token')
   }
+  
+  user_notifications(){
+    return this.belongsToMany('App/Models/Notification').pivotTable('notification_receivers').withPivot(['selected','position'])
+  }
+
+  events(){
+    return this.hasMany('App/Models/Event')
+  }
+
+  user_events(){
+    return this.belongsToMany('App/Models/Event').pivotTable('user_events').withPivot(['selected', 'position'])
+  }
+
+  followers(){
+    return this.belongsToMany('App/Models/User').pivotTable('followes').withPivot(['selected','position'])
+  }
+
+  sendmsg(){
+    return this.hasMany('App/Models/Message','id','sender_id')
+  }
+
+  recivmsg(){
+    return this.hasMany('App/Models/Message','id','receiver_id')
+  }
 }
 
 module.exports = User
