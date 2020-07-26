@@ -58,6 +58,22 @@ class User extends Model {
   recivmsg(){
     return this.hasMany('App/Models/Message','id','receiver_id')
   }
+
+  artworks(){
+    return this.hasMany('App/Models/Artworks','id','user_id')
+  }
+
+  congratulations(){
+    return this.belongsToMany('App/Models/Artworks').pivotTable('congratulations').withPivot(['selectd','position'])
+  }
+
+  favorites(){
+    return this.belongsToMany('App/Models/Artworks').pivotTable('user_favorites').withPivot(['selected','position'])
+  }
+
+  comments(){
+    return this.hasMany('App/Models/Comment', 'id', 'user_id')
+  }
 }
 
 module.exports = User
