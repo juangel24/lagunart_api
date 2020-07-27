@@ -1,10 +1,10 @@
 'use strict'
-const artwork = use('App/Models/Artwork')
-const category = use('App/Models/ArtCategory')
-const subcategory = use('App/Models/ArtSubcategory')
-const user = use('App/Models/User')
-const comment = use('App/Models/Comment')
-const chapter = use('App/Models/Chapter')
+const Artwork = use('App/Models/Artwork')
+const Category = use('App/Models/ArtCategory')
+const Subcategory = use('App/Models/ArtSubcategory')
+const User = use('App/Models/User')
+const Comment = use('App/Models/Comment')
+const Chapter = use('App/Models/Chapter')
 const Database = use('Database')
 
 class ArtWorkController {
