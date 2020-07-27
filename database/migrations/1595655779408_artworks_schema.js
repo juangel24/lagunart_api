@@ -7,13 +7,13 @@ class ArtworksSchema extends Schema {
   up () {
     this.create('artworks', (table) => {
       table.increments()
-      table.string('tittle',100).notNullable()
+      table.string('title',100).notNullable()
       table.text('description')
       table.integer('art_subcategory_id').unsigned().references('id').inTable('art_subcategories').notNullable()
-      table.boolean('is_adult_content')
+      table.boolean('is_adult_content').notNullable()
       table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
-      table.integer('views')
-      table.boolean('is_private')
+      table.integer('views').defaultTo(0)
+      table.boolean('is_private').defaultTo(1)
       table.string('path_img',45)
     })
   }
