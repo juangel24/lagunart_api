@@ -1,19 +1,22 @@
 'use strict'
 
 const Artwork = use('App/Models/Artwork');
-const Artcategory = use('App/Models/ArtCategory');
+const Event = use('App/Models/Event');
+const User = use('App/Models/User')
 class SearchController {
-	async store({request,response}){
-		const data = request.only([
-			'title', 'description', 'art_subcategory_id', 'is_adult_content', 'user_id', 'views', 'is_private', 'path_img'
-		])
-	artwork = await Artwork.create(data)
-	}
+	async home({request, response}){
+		const palabra = request.input('busqueda')
+		const resultados = []
 
-	async pruebon({request,response,view}){
-		let categoria = await Artcategory.findBy('id',1)
-		let subcategoria = await categoria.subcategory().fetch()
-		return response.json(subcategoria)
+		const busqueda = "%" + palabra + "%"
+
+		const artworks = Artwork.query().whereRaw('title like ?', busqueda).fetch()
+		/*if(artworks){
+			for (var i = Things.length - 1; i >= 0; i--) {
+				Things[i]
+			}
+		}*/
+		return artworks
 	}
 }
 

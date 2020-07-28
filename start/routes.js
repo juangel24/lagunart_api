@@ -19,4 +19,4 @@ Route.post('password/reset/:token', 'AuthController.sendResetMail')
 
 Route.get('/index', 'ArtWorkController.index');
 
-Route.get('pifi', 'SearchController.pruebon')
+Route.get('pifi', 'SearchController.home')
