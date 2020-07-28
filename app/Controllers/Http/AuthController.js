@@ -1,7 +1,12 @@
 'use strict'
+const User = use('App/Models/User')
+const PasswordReset = use('App/Models/PasswordReset')
+const Env = use('Env')
+const jwt = require('jws')
+const Mail = use('Mail')
 
 class AuthController {
-  async join({ request, auth }) {
+  async join({ auth, request }) {
     const data = request.only([
       'birth', 'email', 'name', 'password', 'username'
     ])
@@ -18,7 +23,7 @@ class AuthController {
     return this._userWithToken(auth, user)
   }
 
-  async login({ request, auth }) {
+  async login({ auth, request }) {
     const { email, password } = request.all()
 
     if (await auth.attempt(email, password)) {
@@ -28,6 +33,31 @@ class AuthController {
   }
 
   async logout() { await auth.logout() }
+
+  async sendResetMail({ auth, request }) {
+    const email = request.email
+    const user = await User.findBy('email', email)
+
+    if (!user) {
+      return {
+        success: true,
+        msg: 'Si la dirección de correo es válida, deberías recibir un correo'
+      }
+    }
+
+    await PasswordReset.query().where('email', email).delete()
+
+    const token = await jwt.sign({ email: email }, Env.get('APP_KEY'), {
+      expiresIn: 60 * 60 *24
+    })
+
+    await PasswordReset.create({ email: email, token })
+
+    /*await Mail.send('emails.welcome', {}, (message) => {
+      message.from('foo@bar.com')
+      message.to('bar@baz.com')
+    })*/
+  }
 
   async _userWithToken(auth, user) {
     Object.assign(user, await auth.generate(user)) // 2nd parameter is the token
