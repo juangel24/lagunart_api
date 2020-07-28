@@ -10,11 +10,13 @@
   {{ style('css/bootstrap.min') }}
   <!-- Material Design Bootstrap -->
   {{ style('css/mdb.min') }}
+  <!-- Custom style -->
+  {{ style('css/style') }}
 </head>
 <body>
 
   <!-- CONTENT -->
-  <div class="container-fluid">
+  <div id="content" class="container-fluid elegant-color-dark">
     @!section('content')
   </div>
 
