@@ -24,10 +24,10 @@ class AuthController {
   }
 
   async login({ auth, request }) {
-    const { email, password } = request.all()
+    const { username, password } = request.all()
 
-    if (await auth.attempt(email, password)) {
-      let user = await User.findBy('email', email)
+    if (await auth.attempt(username, password)) {
+      let user = await User.findBy('username', username)
       return this._userWithToken(auth, user)
     }
   }
@@ -48,15 +48,15 @@ class AuthController {
     await PasswordReset.query().where('email', email).delete()
 
     const token = await jwt.sign({ email: email }, Env.get('APP_KEY'), {
-      expiresIn: 60 * 60 *24
+      expiresIn: 60 * 60 * 24
     })
 
     await PasswordReset.create({ email: email, token })
 
-    /*await Mail.send('emails.welcome', {}, (message) => {
-      message.from('foo@bar.com')
-      message.to('bar@baz.com')
-    })*/
+    await Mail.send('emails.password-reset', {}, (message) => {
+      message.from('noreply@mail.test')
+      message.to(email)
+    })
   }
 
   async _userWithToken(auth, user) {
