@@ -14,9 +14,5 @@ const Route = use('Route')
 Route.post('join', 'AuthController.join')
 Route.post('login', 'AuthController.login')
 Route.get('logout', 'AuthController.logout').middleware('auth')
-Route.post('password/reset/email', 'AuthController.sendResetMail')
-Route.post('password/reset/:token', 'AuthController.sendResetMail')
 
-Route.get('/index', 'ArtWorkController.index');
-
-Route.get('pifi', 'SearchController.pruebon')
+Route.get('artworks', 'ArtWorkController.index')
