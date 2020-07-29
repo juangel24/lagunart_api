@@ -15,6 +15,19 @@ class SearchController {
 		
 		return {artworks,usuarios,eventos}
 	}
+
+	async user({request, response}){
+		const palabra = request.input('busqueda')
+		const id = request.input('id')
+
+		const busqueda = "%" + palabra + "%"
+
+		const usuario = await User.findBy('id',id)
+		const eventos = await usuario.events().whereRaw('tittle like ?', busqueda).fetch()
+		const artworks = await usuario.artworks().whereRaw('title like ?', busqueda).fetch()
+
+		return {artworks, eventos}
+	}
 }
 
 module.exports = SearchController

@@ -18,3 +18,4 @@ Route.get('logout', 'AuthController.logout').middleware('auth')
 Route.get('artworks', 'ArtWorkController.index')
 
 Route.get('searchome', 'SearchController.home')
+Route.get('searchusuario', 'SearchController.user')
