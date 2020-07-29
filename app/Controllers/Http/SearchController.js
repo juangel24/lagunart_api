@@ -1,19 +1,32 @@
 'use strict'
 
 const Artwork = use('App/Models/Artwork');
-const Artcategory = use('App/Models/ArtCategory');
+const Event = use('App/Models/Event');
+const User = use('App/Models/User')
 class SearchController {
-	async store({request,response}){
-		const data = request.only([
-			'title', 'description', 'art_subcategory_id', 'is_adult_content', 'user_id', 'views', 'is_private', 'path_img'
-		])
-	artwork = await Artwork.create(data)
+	async home({request, response}){
+		const palabra = request.input('busqueda')
+
+		const busqueda = "%" + palabra + "%"
+
+		const artworks = await Artwork.query().whereRaw('title like ?', busqueda).fetch()
+		const usuarios = await User.query().whereRaw('name like ?', busqueda).orWhere('username', 'like', busqueda).fetch()
+		const eventos = await Event.query().whereRaw('tittle like ?', busqueda).fetch()
+		
+		return {artworks,usuarios,eventos}
 	}
 
-	async pruebon({request,response,view}){
-		let categoria = await Artcategory.findBy('id',1)
-		let subcategoria = await categoria.subcategory().fetch()
-		return response.json(subcategoria)
+	async user({request, response}){
+		const palabra = request.input('busqueda')
+		const id = request.input('id')
+
+		const busqueda = "%" + palabra + "%"
+
+		const usuario = await User.findBy('id',id)
+		const eventos = await usuario.events().whereRaw('tittle like ?', busqueda).fetch()
+		const artworks = await usuario.artworks().whereRaw('title like ?', busqueda).fetch()
+
+		return {artworks, eventos}
 	}
 }
 

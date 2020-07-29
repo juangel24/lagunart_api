@@ -7,7 +7,7 @@ const Comment = use('App/Models/Comment')
 const Chapter = use('App/Models/Chapter')
 const Database = use('Database')
 const Drive = use('Drive')
-
+const Helpers = use('Helpers');
 class ArtWorkController {
   async index({
     /*auth*/
@@ -26,12 +26,16 @@ class ArtWorkController {
   }
     async store({ auth, request, response }) {
         const user = await auth.getUser();
-        const picture = request.file('path_img', { types: ['image'], extnames: ['png', 'jpg', 'jpeg'] })
-        const name = 
-        console.log(picture.clientName)
-        //await Drive.put(picture.clientName)
-        
-
+        const validationOptions = {
+            types: ['image'],
+            size: '1mb',
+            extnames: ['png','jpg','jpeg']
+        };
+        const imageFile = request.file('path_img', validationOptions);
+        await imageFile.move(Helpers.tmpPath('uploads'), {
+            overwrite: true
+        })
+        const name = await Math.random() + '.' + imageFile.clientName
         const { title, description, art_subcategory_id, is_adult_content, view, is_private } = request.all()
         const artwork = new Artwork()
 
@@ -42,7 +46,7 @@ class ArtWorkController {
         artwork.user_id = user.id
         artwork.views = view
         artwork.is_private = is_private
-        artwork.path_img = picture
+        artwork.path_img = name
         await artwork.save()
         console.log(artwork);
         return response.json(artwork)
