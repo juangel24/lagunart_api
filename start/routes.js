@@ -14,8 +14,10 @@ const Route = use('Route')
 Route.post('join', 'AuthController.join')
 Route.post('login', 'AuthController.login')
 Route.get('logout', 'AuthController.logout').middleware('auth')
+Route.post('password/reset/mail', 'AuthController.sendResetMail')
+Route.post('password/reset', 'AuthController.resetPassword')
 
 Route.get('artworks', 'ArtWorkController.index')
 
-Route.get('searchome', 'SearchController.home')
-Route.get('searchusuario', 'SearchController.user')
+Route.get('search/home', 'SearchController.home')
+Route.get('search/artworks/user', 'SearchController.user')
