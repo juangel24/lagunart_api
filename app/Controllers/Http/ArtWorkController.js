@@ -32,13 +32,14 @@ class ArtWorkController {
             extnames: ['png','jpg','jpeg']
         };
         const imageFile = request.file('path_img', validationOptions);
-        await imageFile.move(Helpers.tmpPath('uploads'), {
+        await imageFile.move(Helpers.tmpPath('artwork'), {
+            name: 'artwork' + Math.random() + '.' + imageFile.clientName,
             overwrite: true
         })
-        const name = await Math.random() + '.' + imageFile.clientName
+        const name = await 'artwork' + Math.random() + '.' + imageFile.clientName
+
         const { title, description, art_subcategory_id, is_adult_content, view, is_private } = request.all()
         const artwork = new Artwork()
-
         artwork.title = title
         artwork.description = description
         artwork.art_subcategory_id = art_subcategory_id
