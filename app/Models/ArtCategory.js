@@ -7,7 +7,7 @@ class ArtCategory extends Model {
 	static get createdAtColumn() { return null }
 	static get updatedAtColumn() { return null }
 	subcategory(){
-		return this.belongsTo('App/Models/ArtSubcategory')
+		return this.hasMany('App/Models/ArtSubcategory', 'id', 'art_categories_id')
 	}
 }
 
