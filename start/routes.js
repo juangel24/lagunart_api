@@ -15,6 +15,6 @@ Route.post('join', 'AuthController.join')
 Route.post('login', 'AuthController.login')
 Route.get('logout', 'AuthController.logout').middleware('auth')
 
-Route.get('pifi', 'SearchController.home')
-
 Route.get('artworks', 'ArtWorkController.index')
+
+Route.get('searchome', 'SearchController.home')
