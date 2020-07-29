@@ -16,3 +16,4 @@ Route.post('login', 'AuthController.login')
 Route.get('logout', 'AuthController.logout').middleware('auth')
 
 Route.get('artworks', 'ArtWorkController.index')
+Route.post('store','ArtworkController.store')

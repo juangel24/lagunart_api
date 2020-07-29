@@ -24,12 +24,14 @@ class ArtWorkController {
       .limit(20);
     return response.json(index);
   }
-    async store({ auth, request }) {
+    async store({ auth, request, response }) {
         const user = await auth.getUser();
-        const picture = request.file('picture', { types: ['image'], extnames: ['png', 'jpg','jpeg'] })
-        if (picture) {
-          await Drive.put(picture.clientName, picture.stream)
-        }
+        const picture = request.file('path_img', { types: ['image'], extnames: ['png', 'jpg', 'jpeg'] })
+        const name = 
+        console.log(picture.clientName)
+        //await Drive.put(picture.clientName)
+        
+
         const { title, description, art_subcategory_id, is_adult_content, view, is_private } = request.all()
         const artwork = new Artwork()
 
