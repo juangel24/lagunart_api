@@ -18,7 +18,8 @@ Route.post('password/reset/mail', 'AuthController.sendResetMail')
 Route.post('password/reset', 'AuthController.resetPassword')
 
 Route.get('artworks', 'ArtWorkController.index')
-Route.post('store','ArtworkController.store')
+Route.post('create/artworks', 'ArtworkController.store')
+Route.post('add/chapter/:id', 'ArtworkController.chapter')
 
 Route.get('search/home', 'SearchController.home')
 Route.get('search/artworks/user', 'SearchController.user')
