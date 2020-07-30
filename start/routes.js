@@ -21,3 +21,6 @@ Route.get('artworks', 'ArtWorkController.index')
 
 Route.get('search/home', 'SearchController.home')
 Route.get('search/artworks/user', 'SearchController.user')
+
+Route.get('categories', 'CategoryController.categories')
+Route.get('subcategories', 'CategoryController.subcategories')
