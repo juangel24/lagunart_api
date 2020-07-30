@@ -20,6 +20,7 @@ Route.post('password/reset', 'AuthController.resetPassword')
 Route.get('artworks', 'ArtWorkController.index')
 Route.post('create/artworks', 'ArtworkController.store')
 Route.post('add/chapter/:id', 'ArtworkController.chapter')
+Route.patch('update/artwork/:id', 'ArtworkController.update')
 
 Route.get('search/home', 'SearchController.home')
 Route.get('search/artworks/user', 'SearchController.user')
