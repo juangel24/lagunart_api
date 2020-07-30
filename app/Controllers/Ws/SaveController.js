@@ -6,10 +6,14 @@ class SaveController {
     this.request = request
   }
 
-  async onCereate(data){
-  	console.log('hola')
+  async onStart(){
+  	await setInterval((socket) =>{
+  		this.socket.broadcastToAll('start','ahora')
+  	}, 10000, this.socket)
   }
-  async onSave(){}
+
+  // async onSave(data){
+  // }
 }
 
 module.exports = SaveController
