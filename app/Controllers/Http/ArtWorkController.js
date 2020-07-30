@@ -5,9 +5,13 @@ const Subcategory = use('App/Models/ArtSubcategory')
 const User = use('App/Models/User')
 const Comment = use('App/Models/Comment')
 const Chapter = use('App/Models/Chapter')
+const Tags = use('App/Models/Tag')
+
 const Database = use('Database')
 const Drive = use('Drive')
 const Helpers = use('Helpers');
+const { validate } = use('Validator')
+
 class ArtWorkController {
   async index({
     /*auth*/
@@ -25,21 +29,41 @@ class ArtWorkController {
     return response.json(index);
   }
     async store({ auth, request, response }) {
-        const user = await auth.getUser();
-
-        const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
-        const artwork = new Artwork()
-        artwork.title = title
-        artwork.description = description
-        artwork.art_subcategory_id = art_subcategory_id
-        artwork.is_adult_content = is_adult_content
-        artwork.user_id = user.id
-        artwork.views = 0
-        artwork.is_private = is_private
-        //artwork.path_img = name
-        await artwork.save()
-        console.log(artwork);
-        return response.json(artwork)
+      const user = await auth.getUser();
+      const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
+      const artwork = new Artwork()
+      artwork.title = title
+      artwork.description = description
+      artwork.art_subcategory_id = art_subcategory_id
+      artwork.is_adult_content = is_adult_content
+      artwork.user_id = user.id
+      artwork.views = 0
+      artwork.is_private = is_private
+        
+      /*const rules = { name: 'required' }
+      const validation = await validate(request.all(), rules)*/
+    
+      await artwork.save()
+      console.log(artwork);
+      return response.json(artwork)
+  }
+  async tags({ request, response }) {
+    const { name } = request.all()
+    const tag = new Tags()
+    const data = await Tags.query().fetch()
+    for (let i = 0; tag.length; i++){
+     if (data) {
+       return "Ya existe esa etiqueta"
+     } else {
+       tag.name = name
+     }
+  }
+    console.log(data.rows);
+    //return data
+    
+    tag.save()
+    console.log(tag);
+    return response.json(tag)
   }
   async update({ auth, params, request }) {
     const { description, content, } = request.all()
@@ -52,7 +76,7 @@ class ArtWorkController {
     artwork.description = description
     artwork.path_img = name
     artwork.is_adult_content = is_adult_content
- 
+    
     
   }
   async chapter({ auth, request, response, params }) {
@@ -69,20 +93,38 @@ class ArtWorkController {
     chapter.save()
     return response.json(chapter)
   }
-    async congratulate({}) {
+  async congratulate({ }) {
+    const user = getUser()
+    const artwork = await Artwork.find(params.id)
+    const like = new Congratulate()
+    like.user_id = user.id
+    like.artwork_id = artwork.id
+  }
+  async show({}) {
+  }
 
-    }
-    async show({}) {
+  async comment({ auth, request, params, response }) {
+    const user = getUser()
+    const artwork = await Artwork.find(params.id)
 
-    }
-    async comment({}) {
+    const comment = new Comment()
+    const { content } = request.all()
+    comment.content = content
+    comment.user_id = user.id
+    comment.artwork_id = artwork.id
+    comment.save()
+    //console.log(comment);
+    return response.json(comment)
+  }
+  
+  async stream({}) {
 
-    }
-    async stream({}) {
-
-    }
-    async destroy({}) {
-
+  }
+    async destroy({  params, response}) {
+      const artwork = await Artwork.find(params.id)
+      await artwork.chapters().delete()
+      await artwork.delete()
+      return response.json({message:'Se eliminó la obra'})
     }
   }
 
