@@ -106,8 +106,16 @@ class ArtWorkController {
     const congratulate = await user.congratulations().save(artwork)
     return response.json(congratulate)
   }
-  async show({ auth, params}) {
+  async show({ auth, params }) {
+    const user = auth.getUser()
+    const artwork_id = request.input('artwork_id')
+    const artwork = await Artwork.find(artwork_id)
 
+    const user_artwork = Artwork.query().where('user_id', user.id).fetch()
+    const comments = Comment.query().where('artwork_id', artwork)
+    const congratulates = user.congratulations().where('artwork_id', artwork_id)
+
+    return { user_artwork, comments, congratulates}
   }
 
   async comment({ auth, request, params, response }) {
