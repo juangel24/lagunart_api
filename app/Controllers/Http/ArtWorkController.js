@@ -13,10 +13,7 @@ const Helpers = use('Helpers');
 const { validate } = use('Validator')
 
 class ArtWorkController {
-  async index({
-    /*auth*/
-    response
-  }) {
+  async index({ /*auth*/ response }) {
     let index = await Database.select('users.username', 'artworks.tittle', 'artworks.description',
         'art_categories.category', 'art_subcategories.subcategory', 'artworks.is_adult_content',
         'artworks.views', 'artworks.is_private', 'artworks.path_img')
@@ -65,19 +62,30 @@ class ArtWorkController {
     console.log(tag);
     return response.json(tag)
   }
-  async update({ auth, params, request }) {
-    const { description, content, } = request.all()
+  async update({  request }) {
+    const artwork_id = request.input('artwork_id')
+    const artwork = await Artwork.find(artwork_id)
 
+    const { title, description, content, is_adult_content, chapter_title } = request.all()
     const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
     const coverImg = request.file('path_img', validationOptions)
-    await coverImg.move(Helpers.tmpPath('artwork'), { name: 'artwork' + Math.random() + '.' + imageFile.clientName, overwrite: true })
-    const name = await 'artwork' + Math.random() + '.' + imageFile.clientName
+    await coverImg.move(Helpers.tmpPath('artwork'), { name: 'artwork' + Math.random() + '.' + coverImg.clientName, overwrite: true })
+    const name = await 'artwork' + Math.random() + '.' + coverImg.clientName
     
+    artwork.title = title
     artwork.description = description
     artwork.path_img = name
     artwork.is_adult_content = is_adult_content
+
+    const chapter_artwork = await artwork.chapters().fetch()
+    const get_chapters = chapter_artwork.rows
+    get_chapters.tittle = chapter_title
+    get_chapters.content = content
     
-    
+    artwork.save()
+    console.log(get_chapters)
+    get_chapters.save()
+    //return get_chapters
   }
   async chapter({ auth, request, response, params }) {
     const artwork = await Artwork.find(params.id)
@@ -87,24 +95,28 @@ class ArtWorkController {
     chapter.content = content
     chapter.artwork_id = artwork.id
     let chapter_artwork = await artwork.chapters().getCount()
-    //console.log(chapter_artwork)
+
     let number = chapter_artwork
     chapter.order = number + 1
     chapter.save()
     return response.json(chapter)
   }
-  async congratulate({ }) {
+  async congratulate({ auth, response, request}) {
+    const user = await auth.getUser()
+    const artwork_id = request.input('artwork_id')
+    const artwork = await Artwork.find(artwork_id)
+    const congratulate = await user.congratulations().save(artwork)
+    return response.json(congratulate)
+  }
+  async show({ auth, params}) {
     const user = getUser()
     const artwork = await Artwork.find(params.id)
-    const like = new Congratulate()
-    like.user_id = user.id
-    like.artwork_id = artwork.id
-  }
-  async show({}) {
+    const query = await Artwork.query().where('user_id', user.id) 
+    await artwork.chapter().fetch()
   }
 
   async comment({ auth, request, params, response }) {
-    const user = getUser()
+    const user = auth.getUser()
     const artwork = await Artwork.find(params.id)
 
     const comment = new Comment()
@@ -113,7 +125,7 @@ class ArtWorkController {
     comment.user_id = user.id
     comment.artwork_id = artwork.id
     comment.save()
-    //console.log(comment);
+   
     return response.json(comment)
   }
   

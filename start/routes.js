@@ -20,7 +20,7 @@ Route.post('password/reset', 'AuthController.resetPassword')
 Route.get('artworks', 'ArtWorkController.index')
 Route.post('create/artworks', 'ArtWorkController.store')
 Route.post('add/chapter/:id', 'ArtWorkController.chapter')
-Route.patch('update/artwork/:id', 'ArtWorkController.update')
+Route.patch('update/artwork', 'ArtWorkController.update')
 Route.delete('delete/artwork/:id', 'ArtWorkController.destroy')
 
 //COMMENTS
