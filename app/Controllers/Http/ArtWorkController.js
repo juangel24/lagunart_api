@@ -106,28 +106,27 @@ class ArtWorkController {
     const congratulate = await user.congratulations().save(artwork)
     return response.json(congratulate)
   }
-  async show({ auth, params }) {
-    const user = auth.getUser()
+  async show({ auth, request }) {
+    const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
 
-    const user_artwork = Artwork.query().where('user_id', user.id).fetch()
-    const comments = Comment.query().where('artwork_id', artwork)
-    const congratulates = user.congratulations().where('artwork_id', artwork_id)
+    const user_artwork = await Artwork.query().where('user_id', user.id).fetch()
+    const comments = await Comment.query().where('artwork_id', artwork.id).fetch()
+    //const congratulates = await user.congratulations().where('artwork_id', artwork_id)
 
-    return { user_artwork, comments, congratulates}
+    return { user_artwork, comments}
   }
 
   async comment({ auth, request, params, response }) {
-    const user = auth.getUser()
+    const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
 
     const comment = new Comment()
-    const { content } = request.all()
-    comment.content = content
+    comment.content = request.input('content')
     comment.user_id = user.id
-    comment.artwork_id = artwork
+    comment.artwork_id = artwork.id
     comment.save()
    
     return response.json(comment)
