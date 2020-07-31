@@ -15,9 +15,7 @@ class CategoryController {
 
 	async prueba({request, response}){
 		const user = await User.findBy('id', 1)
-		const artwork = await Artwork.findBy('id', 1)
-		user.congratulations().save(artwork)
-		return "listo"
+		return user.user_events().fetch()
 	}
 }
 
