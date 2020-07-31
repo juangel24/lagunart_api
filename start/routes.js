@@ -19,16 +19,16 @@ Route.post('password/reset', 'AuthController.resetPassword')
 
 Route.get('artworks', 'ArtWorkController.index')
 Route.post('create/artworks', 'ArtWorkController.store')
-Route.post('add/chapter/:id', 'ArtWorkController.chapter')
-Route.patch('update/artwork', 'ArtWorkController.update')
-Route.delete('delete/artwork/:id', 'ArtWorkController.destroy')
+Route.post('create/artwork/chapter/:id', 'ArtWorkController.chapter')
+Route.patch('artwork/update', 'ArtWorkController.update')
+Route.delete('artwork/delete/:id', 'ArtWorkController.destroy')
 
 //COMMENTS
 Route.post('comment/artwork', 'ArtWorkController.comment')
 //Route.get('comment/artwork','ArtWorkController.showcomment')
 
 //LIKES
-Route.post('like/artwork','ArtWorkController.congratulate')
+Route.post('artwork/like','ArtWorkController.congratulate')
 Route.post('/pruebon','ArtWorkController.tags')
 
 
