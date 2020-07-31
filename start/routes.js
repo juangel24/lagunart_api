@@ -24,5 +24,3 @@ Route.get('search/artworks/user', 'SearchController.user')
 
 Route.get('categories', 'CategoryController.categories')
 Route.get('subcategories', 'CategoryController.subcategories')
-
-Route.post('pifi', 'CategoryController.prueba')
