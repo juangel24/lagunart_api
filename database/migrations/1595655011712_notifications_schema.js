@@ -9,7 +9,7 @@ class NotificationsSchema extends Schema {
       table.increments()
       table.string('content', 200).notNullable()
       table.string('type', 45).notNullable()
-      table.integer('source_id').notNullable()
+      table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
       table.timestamps()
     })
   }

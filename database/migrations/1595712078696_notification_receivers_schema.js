@@ -7,7 +7,7 @@ class NotificationReceiversSchema extends Schema {
   up () {
     this.create('notification_receivers', (table) => {
     	table.integer('notification_id').unsigned().references('id').inTable('notifications').notNullable()
-    	table.integer('receiver_id').unsigned().references('id').inTable('users').notNullable()
+    	table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
     	table.boolean('is_viewed').notNullable()
     })
   }
