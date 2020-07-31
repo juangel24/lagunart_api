@@ -109,21 +109,19 @@ class ArtWorkController {
     return response.json(congratulate)
   }
   async show({ auth, params}) {
-    const user = getUser()
-    const artwork = await Artwork.find(params.id)
-    const query = await Artwork.query().where('user_id', user.id) 
-    await artwork.chapter().fetch()
+
   }
 
   async comment({ auth, request, params, response }) {
     const user = auth.getUser()
-    const artwork = await Artwork.find(params.id)
+    const artwork_id = request.input('artwork_id')
+    const artwork = await Artwork.find(artwork_id)
 
     const comment = new Comment()
     const { content } = request.all()
     comment.content = content
     comment.user_id = user.id
-    comment.artwork_id = artwork.id
+    comment.artwork_id = artwork
     comment.save()
    
     return response.json(comment)
