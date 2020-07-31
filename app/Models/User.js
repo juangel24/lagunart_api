@@ -66,11 +66,11 @@ class User extends Model {
   }
 
   congratulations(){
-    return this.belongsToMany('App/Models/Artwork').pivotTable('congratulations').withPivot(['selectd','position'])
+    return this.belongsToMany('App/Models/Artwork').pivotTable('congratulations').withPivot(['user_id','artwork_id'])
   }
 
   favorites(){
-    return this.belongsToMany('App/Models/Artwork').pivotTable('user_favorites').withPivot(['selected','position'])
+    return this.belongsToMany('App/Models/Artwork').pivotTable('user_favorites').withPivot(['artwork_id','user_id'])
   }
 
   comments(){
