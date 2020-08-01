@@ -49,12 +49,12 @@ class User extends Model {
     return this.belongsToMany('App/Models/Event').pivotTable('user_events')
   }
 
-  followers(){
-    return this.hasMany('App/Models/User', 'id', 'follower')
+  followeds(){
+    return this.hasMany('App/Models/Follower', 'id', 'follower')
   }
 
-  followeds(){
-    return this.hasMany('App/Models/User', 'id', 'followed')
+  followers(){
+    return this.hasMany('App/Models/Follower', 'id', 'followed')
   }
 
   sendmsg(){
