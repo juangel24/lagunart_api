@@ -8,8 +8,6 @@ class ArtCategoriesSchema extends Schema {
     this.create('art_categories', (table) => {
       table.increments()
       table.string('category', 100).notNullable()
-      .onUpdate('CASCADE')
-      .onDelete('CASCADE')
     })
   }
 

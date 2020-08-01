@@ -8,8 +8,6 @@ class UserFavoritesSchema extends Schema {
     this.create('user_favorites', (table) => {
     	table.integer('artwork_id').unsigned().references('id').inTable('artworks').notNullable()
     	table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
-    	.onUpdate('CASCADE')
-      	.onDelete('CASCADE')
     })
   }
 

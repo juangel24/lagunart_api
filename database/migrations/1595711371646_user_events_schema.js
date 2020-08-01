@@ -8,8 +8,6 @@ class UserEventsSchema extends Schema {
     this.create('user_events', (table) => {
     	table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
     	table.integer('event_id').unsigned().references('id').inTable('events').notNullable()
-    	.onUpdate('CASCADE')
-      	.onDelete('CASCADE')
     })
   }
 

@@ -8,8 +8,6 @@ class CongratulationsSchema extends Schema {
     this.create('congratulations', (table) => {
     	table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
     	table.integer('artwork_id').unsigned().references('id').inTable('artworks').notNullable()
-    	.onUpdate('CASCADE')
-    	.onDelete('CASCADE')
     })
   }
 

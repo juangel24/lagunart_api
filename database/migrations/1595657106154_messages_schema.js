@@ -11,8 +11,6 @@ class MessagesSchema extends Schema {
       table.integer('sender_id').unsigned().references('id').inTable('users').notNullable()
       table.integer('receiver_id').unsigned().references('id').inTable('users').notNullable()
       table.timestamps()
-      .onUpdate('CASCADE')
-      .onDelete('CASCADE')
     })
   }
 

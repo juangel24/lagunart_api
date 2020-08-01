@@ -15,8 +15,6 @@ class UserSchema extends Schema {
       table.string('profile_img', 45)
       table.string('cover_img', 45)
       table.timestamps()
-      .onUpdate('CASCADE')
-      .onDelete('CASCADE')
     })
   }
 
