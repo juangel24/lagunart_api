@@ -11,6 +11,8 @@ class CommentsSchema extends Schema {
       table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
       table.integer('artwork_id').unsigned().references('id').inTable('artworks').notNullable()
       table.timestamps()
+      .onUpdate('CASCADE')
+      .onDelete('CASCADE')
     })
   }
 
