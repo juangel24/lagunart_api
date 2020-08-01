@@ -38,7 +38,7 @@ class User extends Model {
   }
 
   user_notifications(){
-    return this.belongsToMany('App/Models/Notification').pivotTable('notification_receivers').withPivot(['selected','position'])
+    return this.belongsToMany('App/Models/Notification').pivotTable('notification_receivers').withPivot(['is_viewed'])
   }
 
   events(){
@@ -46,11 +46,15 @@ class User extends Model {
   }
 
   user_events(){
-    return this.belongsToMany('App/Models/Event').pivotTable('user_events').withPivot(['selected', 'position'])
+    return this.belongsToMany('App/Models/Event').pivotTable('user_events')
   }
 
   followers(){
-    return this.belongsToMany('App/Models/User').pivotTable('followes').withPivot(['selected','position'])
+    return this.hasMany('App/Models/User', 'id', 'follower')
+  }
+
+  followeds(){
+    return this.hasMany('App/Models/User', 'id', 'followed')
   }
 
   sendmsg(){
@@ -66,11 +70,11 @@ class User extends Model {
   }
 
   congratulations(){
-    return this.belongsToMany('App/Models/Artwork').pivotTable('congratulations').withPivot(['selectd','position'])
+    return this.belongsToMany('App/Models/Artwork').pivotTable('congratulations')
   }
 
   favorites(){
-    return this.belongsToMany('App/Models/Artwork').pivotTable('user_favorites').withPivot(['selected','position'])
+    return this.belongsToMany('App/Models/Artwork').pivotTable('user_favorites')
   }
 
   comments(){
