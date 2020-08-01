@@ -16,7 +16,7 @@ class Artwork extends Model {
 	}
 
 	tags(){
-		return this.belongsToMany('App/Models/Tag')
+		return this.belongsToMany('App/Models/Tag').pivotTable('artworks_has_tags')
 	}
 }
 
