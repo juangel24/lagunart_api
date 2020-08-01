@@ -6,8 +6,8 @@ const Schema = use('Schema')
 class ArtworksHasTagsSchema extends Schema {
   up () {
     this.create('artworks_has_tags', (table) => {
-    	table.integer('artworks_id').unsigned().references('id').inTable('artworks').notNullable()
-    	table.integer('tags_id').unsigned().references('id').inTable('tags').notNullable()
+    	table.integer('artwork_id').unsigned().references('id').inTable('artworks').notNullable()
+    	table.integer('tag_id').unsigned().references('id').inTable('tags').notNullable()
     })
   }
 
