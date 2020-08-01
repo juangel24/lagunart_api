@@ -10,12 +10,24 @@ class NotificationController {
 
   async onNotification(variable){
   	let user = await User.find(variable.user)
+  	let segu = await user.followers().fetch()
+  	let seguidores = segu.rows
   	let notificacion = new Notification()
   	notificacion.content = variable.content
   	notificacion.type = variable.type
   	notificacion.user_id = variable.user
-  	notificacion.save()
-  	await user.user_notifications().save(notificacion)
+  	await notificacion.save()
+
+  	for (var i = 0; i < seguidores.length; i++) {
+  		try{
+  			user = await User.find(seguidores[i].follower)
+	  		await user.user_notifications().save(notificacion)
+  		}catch(error){
+  			console.log(error)
+  		}
+  	}
+
+  	this.socket.broadcastToAll('notificacion', notificacion)
   }
 }
 
