@@ -11,9 +11,6 @@ class SaveController {
   		this.socket.broadcastToAll('start','ahora')
   	}, 10000, this.socket)
   }
-
-  // async onSave(data){
-  // }
 }
 
 module.exports = SaveController

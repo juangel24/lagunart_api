@@ -16,3 +16,4 @@
 const Ws = use('Ws')
 
 Ws.channel('save', "SaveController")
+Ws.channel('notification', "NotificationController")
