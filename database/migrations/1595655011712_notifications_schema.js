@@ -11,7 +11,6 @@ class NotificationsSchema extends Schema {
       table.string('type', 45).notNullable()
       table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
       table.timestamps()
-      .onUpdate('CASCADE')
       .onDelete('CASCADE')
     })
   }

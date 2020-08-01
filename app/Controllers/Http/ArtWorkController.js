@@ -25,42 +25,21 @@ class ArtWorkController {
       .limit(20);
     return response.json(index);
   }
-    async store({ auth, request, response }) {
-      const user = await auth.getUser();
-      const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
-      const artwork = new Artwork()
-      artwork.title = title
-      artwork.description = description
-      artwork.art_subcategory_id = art_subcategory_id
-      artwork.is_adult_content = is_adult_content
-      artwork.user_id = user.id
-      artwork.views = 0
-      artwork.is_private = is_private
+  async store({ auth, request, response }) {
+    const user = await auth.getUser();
+    const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
+    const artwork = new Artwork()
+    artwork.title = title
+    artwork.description = description
+    artwork.art_subcategory_id = art_subcategory_id
+    artwork.is_adult_content = is_adult_content
+    artwork.user_id = user.id
+    artwork.views = 0
+    artwork.is_private = is_private
         
-      /*const rules = { name: 'required' }
-      const validation = await validate(request.all(), rules)*/
-    
-      await artwork.save()
-      console.log(artwork);
-      return response.json(artwork)
-  }
-  async tags({ request, response }) {
-    const { name } = request.all()
-    const tag = new Tags()
-    const data = await Tags.query().fetch()
-    for (let i = 0; tag.length; i++){
-     if (data) {
-       return "Ya existe esa etiqueta"
-     } else {
-       tag.name = name
-     }
-  }
-    console.log(data.rows);
-    //return data
-    
-    tag.save()
-    console.log(tag);
-    return response.json(tag)
+    await artwork.save()
+    console.log(artwork);
+    return response.json(artwork)
   }
   async update({  request }) {
     const artwork_id = request.input('artwork_id')
@@ -83,7 +62,20 @@ class ArtWorkController {
     chapter_artwork.tittle = tittle
     chapter_artwork.content = content
     chapter_artwork.save()
-    return {artwork, chapter_artwork}
+
+    const tag = new Tags()
+    tag.name = request.input('name')
+    const data = await Tags.query().fetch()
+    const x = data.rows
+      for (let i = 0; i < x.length; i++) {
+        if (tag.name == x[i].name) {
+          console.log(x[i])
+          return "Ya existe esa etiqueta"
+        }
+      }
+    tag.save()
+    await artwork.tags().save(tag)
+    return {artwork, chapter_artwork }
   }
   async chapter({ auth, request, response, params }) {
     const artwork = await Artwork.find(params.id)
@@ -113,7 +105,7 @@ class ArtWorkController {
 
     const user_artwork = await Artwork.query().where('user_id', user.id).fetch()
     const comments = await Comment.query().where('artwork_id', artwork.id).fetch()
-    //const congratulates = await user.congratulations().where('artwork_id', artwork_id)
+    const congratulates = await user.congratulations().where('artwork_id', artwork_id).fetch()
 
     return { user_artwork, comments}
   }
