@@ -8,7 +8,6 @@ class TagsSchema extends Schema {
     this.create('tags', (table) => {
       table.increments()
       table.string('name',50).notNullable()
-      .onDelete('CASCADE')
     })
   }
 

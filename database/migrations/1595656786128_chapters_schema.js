@@ -11,7 +11,6 @@ class ChaptersSchema extends Schema {
       table.text('content','longtext')
       table.integer('order')
       table.integer('artwork_id').unsigned().references('id').inTable('artworks').notNullable()
-      .onDelete('CASCADE')
     })
   }
 

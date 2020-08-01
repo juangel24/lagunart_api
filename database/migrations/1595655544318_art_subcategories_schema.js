@@ -9,7 +9,6 @@ class ArtSubcategoriesSchema extends Schema {
       table.increments()
       table.string('subcategory', 50).notNullable()
       table.integer('art_categories_id').unsigned().references('id').inTable('art_categories').notNullable()
-      .onDelete('CASCADE')
     })
   }
 

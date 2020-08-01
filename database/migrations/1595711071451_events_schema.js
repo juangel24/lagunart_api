@@ -14,7 +14,6 @@ class EventsSchema extends Schema {
       table.date('date').notNullable()
       table.time('time').notNullable()
       table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
-      .onDelete('CASCADE')
     })
   }
 
