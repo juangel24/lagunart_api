@@ -9,9 +9,13 @@ class NotificationController {
   }
 
   async onNotification(variable){
-  	let user = await User.find(variable)
-  	let notificacion = await user.user_notifications().fetch()
-  	this.socket.broadcastToAll('notificaciones', notificacion)
+  	let user = await User.find(variable.user)
+  	let notificacion = new Notification()
+  	notificacion.content = variable.content
+  	notificacion.type = variable.type
+  	notificacion.user_id = variable.user
+  	notificacion.save()
+  	await user.user_notifications().save(notificacion)
   }
 }
 
