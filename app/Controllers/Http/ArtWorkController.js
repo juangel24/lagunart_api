@@ -25,9 +25,12 @@ class ArtWorkController {
       .limit(20);
     return response.json(index);
   }
+
   async store({ auth, request, response }) {
     const user = await auth.getUser();
+
     const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
+    
     const artwork = new Artwork()
     artwork.title = title
     artwork.description = description
@@ -41,6 +44,7 @@ class ArtWorkController {
     console.log(artwork);
     return response.json(artwork)
   }
+
   async update({  request }) {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
@@ -56,13 +60,15 @@ class ArtWorkController {
     artwork.path_img = name
     artwork.is_adult_content = is_adult_content
     artwork.save()
-
+    
+  //ADD CHAPTER TO ARTWORK
     const chapter_artwork = await artwork.chapters().first()
     const { tittle,content} = request.all()
     chapter_artwork.tittle = tittle
     chapter_artwork.content = content
     chapter_artwork.save()
 
+  //ADD TAGS TO ARTWORK
     const tag = new Tags()
     tag.name = request.input('name')
     const data = await Tags.query().fetch()
@@ -72,13 +78,16 @@ class ArtWorkController {
           console.log(x[i])
           return "Ya existe esa etiqueta"
         }
-      }
-    tag.save()
+    }
+
+    //await artwork.tags().detach(tag)
     await artwork.tags().save(tag)
     return {artwork, chapter_artwork }
   }
+
   async chapter({ auth, request, response, params }) {
     const artwork = await Artwork.find(params.id)
+
     const chapter = new Chapter()
     const { title, content } = request.all()
     chapter.tittle = title
@@ -91,9 +100,11 @@ class ArtWorkController {
     chapter.save()
     return response.json(chapter)
   }
-  async congratulate({ auth, response, request}) {
+
+  async congratulate({ auth, response, request }) {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
+
     const artwork = await Artwork.find(artwork_id)
     const congratulate = await user.congratulations().save(artwork)
     return response.json(congratulate)
@@ -127,12 +138,13 @@ class ArtWorkController {
   async stream({}) {
 
   }
-    async destroy({  params, response}) {
-      const artwork = await Artwork.find(params.id)
-      await artwork.chapters().delete()
-      await artwork.delete()
-      return response.json({message:'Se eliminó la obra'})
-    }
+  async destroy({  params, response}) {
+    const artwork = await Artwork.find(params.id)
+    await artwork.chapters().delete()
+    await artwork.tags().delete()
+    await artwork.delete()
+    return response.json({message:'Se eliminó la obra'})
   }
+}
 
   module.exports = ArtWorkController
