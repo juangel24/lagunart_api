@@ -22,7 +22,12 @@ Route.post('create/artworks', 'ArtWorkController.store')
 Route.post('create/artwork/chapter/:id', 'ArtWorkController.chapter')
 Route.patch('artwork/update', 'ArtWorkController.update')
 Route.delete('artwork/delete/:id', 'ArtWorkController.destroy')
-Route.get('artworks/show','ArtWorkController.show')
+Route.get('artworks/show', 'ArtWorkController.show')
+
+//EVENTS
+Route.post('event/create', 'EventController.store')
+Route.patch('event/update','EventController.update')
+Route.delete('event/delete/:id', 'EventController.destroy')
 //COMMENTS
 Route.post('comment/artwork', 'ArtWorkController.comment')
 //Route.get('comment/artwork','ArtWorkController.showcomment')

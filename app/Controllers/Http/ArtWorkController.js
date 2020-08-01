@@ -142,6 +142,8 @@ class ArtWorkController {
     const artwork = await Artwork.find(params.id)
     await artwork.chapters().delete()
     await artwork.tags().delete()
+    await artwork.congratulations().delete()
+    await artwork.comments().delete()
     await artwork.delete()
     return response.json({message:'Se eliminó la obra'})
   }
