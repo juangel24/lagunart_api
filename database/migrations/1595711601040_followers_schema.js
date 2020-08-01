@@ -10,6 +10,8 @@ class FollowersSchema extends Schema {
     	table.integer('follower').unsigned().references('id').inTable('users').notNullable()
     	table.integer('followed').unsigned().references('id').inTable('users').notNullable()
     	table.boolean('is_followed').notNullable()
+      .onUpdate('CASCADE')
+      .onDelete('CASCADE')
     })
   }
 

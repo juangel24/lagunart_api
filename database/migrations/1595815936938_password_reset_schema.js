@@ -10,6 +10,8 @@ class PasswordResetSchema extends Schema {
       table.string('email')
       table.string('token')
       table.timestamps()
+      .onUpdate('CASCADE')
+      .onDelete('CASCADE')
     })
   }
 

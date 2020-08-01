@@ -15,6 +15,8 @@ class ArtworksSchema extends Schema {
       table.integer('views').defaultTo(0)
       table.boolean('is_private').defaultTo(1)
       table.string('path_img',45)
+      .onUpdate('CASCADE')
+      .onDelete('CASCADE')
     })
   }
 

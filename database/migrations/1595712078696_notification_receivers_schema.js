@@ -9,6 +9,8 @@ class NotificationReceiversSchema extends Schema {
     	table.integer('notification_id').unsigned().references('id').inTable('notifications').notNullable()
     	table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
     	table.boolean('is_viewed').notNullable()
+      .onUpdate('CASCADE')
+      .onDelete('CASCADE')
     })
   }
 

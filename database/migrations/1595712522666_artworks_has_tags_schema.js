@@ -8,6 +8,8 @@ class ArtworksHasTagsSchema extends Schema {
     this.create('artworks_has_tags', (table) => {
     	table.integer('artwork_id').unsigned().references('id').inTable('artworks').notNullable()
     	table.integer('tag_id').unsigned().references('id').inTable('tags').notNullable()
+    	.onUpdate('CASCADE')
+      	.onDelete('CASCADE')
     })
   }
 
