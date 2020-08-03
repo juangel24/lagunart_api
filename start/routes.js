@@ -37,8 +37,8 @@ Route.post('artwork/like','ArtWorkController.congratulate')
 Route.post('/pruebon','ArtWorkController.tags')
 
 
-Route.get('search/home', 'SearchController.home')
-Route.get('search/artworks/user', 'SearchController.user')
+Route.get('search/home/:params', 'SearchController.home')
+Route.get('search/artworks/user/:params/:id', 'SearchController.user')
 
 Route.get('categories', 'CategoryController.categories')
 Route.get('subcategories', 'CategoryController.subcategories')
