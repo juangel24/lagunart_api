@@ -15,8 +15,8 @@ const { validate } = use('Validator')
 class ArtWorkController {
   async index({ /*auth*/ response }) {
     let index = await Database.select('users.username', 'artworks.tittle', 'artworks.description',
-        'art_categories.category', 'art_subcategories.subcategory', 'artworks.is_adult_content',
-        'artworks.views', 'artworks.is_private', 'artworks.path_img')
+      'art_categories.category', 'art_subcategories.subcategory', 'artworks.is_adult_content',
+      'artworks.views', 'artworks.is_private', 'artworks.path_img')
       .from('art_categories')
       .innerJoin('art_subcategories', 'art_subcategories.art_categories_id', 'art_categories.id')
       .innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
@@ -45,7 +45,7 @@ class ArtWorkController {
     return response.json(artwork)
   }
 
-  async update({  request }) {
+  async update({ request }) {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
 
@@ -61,28 +61,29 @@ class ArtWorkController {
     artwork.is_adult_content = is_adult_content
     artwork.save()
     
-  //ADD CHAPTER TO ARTWORK
+    //ADD CHAPTER TO ARTWORK
     const chapter_artwork = await artwork.chapters().first()
-    const { tittle,content} = request.all()
+    const { tittle, content } = request.all()
     chapter_artwork.tittle = tittle
     chapter_artwork.content = content
     chapter_artwork.save()
 
-  //ADD TAGS TO ARTWORK
+    //ADD TAGS TO ARTWORK
     const tag = new Tags()
     tag.name = request.input('name')
     const data = await Tags.query().fetch()
     const x = data.rows
-      for (let i = 0; i < x.length; i++) {
-        if (tag.name == x[i].name) {
-          console.log(x[i])
-          return "Ya existe esa etiqueta"
-        }
+    for (let i = 0; i < x.length; i++) {
+      if (tag.name == x[i].name) {
+        console.log(x[i])
+        return "Ya existe esa etiqueta"
+      }
     }
-
     //await artwork.tags().detach(tag)
-    await artwork.tags().save(tag)
-    return {artwork, chapter_artwork }
+    const tag_id = await Tag.find(x.id)
+    console.log(tag_id);
+    /*await artwork.tags().save(tag)
+    return {artwork, chapter_artwork }*/
   }
 
   async chapter({ auth, request, response, params }) {
@@ -118,7 +119,7 @@ class ArtWorkController {
     const comments = await Comment.query().where('artwork_id', artwork.id).fetch()
     const congratulates = await user.congratulations().where('artwork_id', artwork_id).fetch()
 
-    return { user_artwork, comments}
+    return { user_artwork, comments }
   }
 
   async comment({ auth, request, params, response }) {
@@ -135,17 +136,37 @@ class ArtWorkController {
     return response.json(comment)
   }
   
-  async stream({}) {
+  async stream({ }) {
 
   }
-  async destroy({  params, response}) {
+  async destroy({ params, response }) {
     const artwork = await Artwork.find(params.id)
     await artwork.chapters().delete()
     await artwork.tags().delete()
     await artwork.congratulations().delete()
     await artwork.comments().delete()
     await artwork.delete()
-    return response.json({message:'Se eliminó la obra'})
+    return response.json({ message: 'Se eliminó la obra' })
+  }
+  async tags({ request }) {
+    const tag = new Tags()
+    /*const tag_id = request.input('tag_id')
+    tag = await Tags.find(tag_id)*/
+    tag.name = request.input('name')
+
+    const data = await Tags.query().fetch()
+    const x = data.rows
+      for (let i = 0; i < x.length; i++) {
+        if (tag.name == x[i].name) {
+          console.log(x[i])
+          return "Ya existe esa etiqueta"
+        }
+    }
+    //await artwork.tags().detach(tag)
+    await tag.save()
+    //const tag_id = await tag.findBy(x.id)
+    /*await artwork.tags().save(tag)
+    return {artwork, chapter_artwork }*/
   }
 }
 

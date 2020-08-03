@@ -45,3 +45,6 @@ Route.get('subcategories', 'CategoryController.subcategories')
 
 Route.get('notifications/:id', 'NotificationController.index')
 Route.post('notifications/modify', 'NotificationController.update')
+
+//TAGS
+Route.get('tags/:params','TagController.index')
