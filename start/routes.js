@@ -18,12 +18,33 @@ Route.post('password/reset/mail', 'AuthController.sendResetMail')
 Route.post('password/reset', 'AuthController.resetPassword')
 
 Route.get('artworks', 'ArtWorkController.index')
+Route.post('create/artworks', 'ArtWorkController.store')
+Route.post('create/artwork/chapter/:id', 'ArtWorkController.chapter')
+Route.patch('artwork/update', 'ArtWorkController.update')
+Route.delete('artwork/delete/:id', 'ArtWorkController.destroy')
+Route.get('artworks/show', 'ArtWorkController.show')
 
-Route.get('search/home', 'SearchController.home')
-Route.get('search/artworks/user', 'SearchController.user')
+//EVENTS
+Route.post('event/create', 'EventController.store')
+Route.patch('event/update','EventController.update')
+Route.delete('event/delete/:id', 'EventController.destroy')
+//COMMENTS
+Route.post('comment/artwork', 'ArtWorkController.comment')
+//Route.get('comment/artwork','ArtWorkController.showcomment')
+
+//LIKES
+Route.post('artwork/like','ArtWorkController.congratulate')
+Route.post('/pruebon','ArtWorkController.tags')
+
+
+Route.get('search/home/:params', 'SearchController.home')
+Route.get('search/artworks/user/:params/:id', 'SearchController.user')
 
 Route.get('categories', 'CategoryController.categories')
 Route.get('subcategories', 'CategoryController.subcategories')
 
 Route.get('notifications/:id', 'NotificationController.index')
 Route.post('notifications/modify', 'NotificationController.update')
+
+//TAGS
+Route.get('tags/:params','TagController.index')

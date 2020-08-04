@@ -4,8 +4,8 @@ const Artwork = use('App/Models/Artwork');
 const Event = use('App/Models/Event');
 const User = use('App/Models/User')
 class SearchController {
-	async home({request, response}){
-		const palabra = request.input('busqueda')
+	async home({params}){
+		const palabra = params.params
 
 		const busqueda = "%" + palabra + "%"
 
@@ -16,13 +16,13 @@ class SearchController {
 		return {artworks,usuarios,eventos}
 	}
 
-	async user({request, response}){
-		const palabra = request.input('busqueda')
-		const id = request.input('id')
+	async user({params, id}){
+		const palabra = params.params
+		const user = params.id
 
 		const busqueda = "%" + palabra + "%"
 
-		const usuario = await User.findBy('id',id)
+		const usuario = await User.findBy('id',user)
 		const eventos = await usuario.events().whereRaw('tittle like ?', busqueda).fetch()
 		const artworks = await usuario.artworks().whereRaw('title like ?', busqueda).fetch()
 
