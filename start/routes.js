@@ -48,3 +48,6 @@ Route.post('notifications/modify', 'NotificationController.update')
 
 //TAGS
 Route.get('tags/:params','TagController.index')
+
+// PAGE
+Route.get(':username', 'UserController.show')
