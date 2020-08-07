@@ -63,14 +63,14 @@ class ArtWorkController {
     
     //ADD CHAPTER TO ARTWORK
     const chapter_artwork = await artwork.chapters().first()
-    const { tittle, content } = request.all()
+    const { tittle, content, name2 } = request.all()
     chapter_artwork.tittle = tittle
     chapter_artwork.content = content
     chapter_artwork.save()
 
     //ADD TAGS TO ARTWORK
     const tag = new Tags()
-    tag.name = request.input('name')
+    tag.name = name2 
     const data = await Tags.query().fetch()
     const x = data.rows
     for (let i = 0; i < x.length; i++) {
@@ -80,10 +80,8 @@ class ArtWorkController {
       }
     }
     //await artwork.tags().detach(tag)
-    const tag_id = await Tag.find(x.id)
-    console.log(tag_id);
-    /*await artwork.tags().save(tag)
-    return {artwork, chapter_artwork }*/
+    await artwork.tags().save(tag)
+    return {artwork, chapter_artwork, tag }
   }
 
   async chapter({ auth, request, response, params }) {
@@ -117,9 +115,10 @@ class ArtWorkController {
 
     const user_artwork = await Artwork.query().where('user_id', user.id).fetch()
     const comments = await Comment.query().where('artwork_id', artwork.id).fetch()
+    const commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
     const congratulates = await user.congratulations().where('artwork_id', artwork_id).fetch()
-
-    return { user_artwork, comments }
+    const congratulatesCount = await user.congratulations().where('artwork_id', artwork_id).getCount()
+    return { user_artwork, comments, commentsCount, congratulates, congratulatesCount }
   }
 
   async comment({ auth, request, params, response }) {
@@ -139,6 +138,7 @@ class ArtWorkController {
   async stream({ }) {
 
   }
+
   async destroy({ params, response }) {
     const artwork = await Artwork.find(params.id)
     await artwork.chapters().delete()
@@ -148,12 +148,15 @@ class ArtWorkController {
     await artwork.delete()
     return response.json({ message: 'Se eliminó la obra' })
   }
-  async tags({ request }) {
+  async tags({ request, response }) {
     const tag = new Tags()
     /*const tag_id = request.input('tag_id')
     tag = await Tags.find(tag_id)*/
-    tag.name = request.input('name')
-
+    /*const artwork_id = request.input('artwork_id')
+    const artwork = await Artwork.find(artwork_id)*/
+    const { name } = request.all()
+    tag.name =  name 
+   
     const data = await Tags.query().fetch()
     const x = data.rows
       for (let i = 0; i < x.length; i++) {
@@ -163,10 +166,11 @@ class ArtWorkController {
         }
     }
     //await artwork.tags().detach(tag)
-    await tag.save()
-    //const tag_id = await tag.findBy(x.id)
-    /*await artwork.tags().save(tag)
-    return {artwork, chapter_artwork }*/
+     await tag.save()
+    //const tag_id = await tag.findBy(adonis serx.id)
+    //await artwork.tags().save(tag)
+    return response.json(tag)
+    //return {artwork, chapter_artwork }
   }
 }
 

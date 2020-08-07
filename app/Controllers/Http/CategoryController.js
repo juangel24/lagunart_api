@@ -6,7 +6,6 @@ class CategoryController {
 	async categories(){
 		return Category.query().fetch()
 	}
-
 	async subcategories(){
 		return Subcategory.query().fetch()
 	}
