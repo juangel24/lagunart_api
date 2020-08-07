@@ -4,7 +4,8 @@ const Category = use('App/Models/ArtCategory');
 const Subcategory = use('App/Models/ArtSubcategory');
 class CategoryController {
 	async categories(){
-		return Category.query().fetch()
+		const catego = await Category.query().fetch()
+		return {catego}
 	}
 
 	async subcategories(){
