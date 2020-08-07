@@ -1,5 +1,6 @@
 'use strict'
 const Artwork = use('App/Models/Artwork')
+const Follower = use('App/Models/Follower')
 const User = use('App/Models/User')
 const Db = use('Database')
 
@@ -26,12 +27,23 @@ class UserController {
   }
 
   async favorites({ request }) {
-    const user = await User.find(request.get('user_id'))
+    const user = await User.find(request.input('user_id'))
     return await user.favorites().fetch()
   }
 
-  async follow({ request }) {
-    //await Follower.create(request.only(['follower', 'followed']))
+  async follow({ request, response }) {
+    const data = request.only(['follower', 'user_id'])
+    const follower = await Follower.query().where('follower', data.follower)
+      .andWhere('user_id', data.user_id).first()
+    const followedUser = await User.find(data.user_id)
+
+    if (follower) {
+      await followedUser.followers().detach([data.follower])
+      return response.send('Dejaste de seguir a ' + followedUser.username)
+    }
+
+    await Follower.create(data)
+    return response.send('Sigues a ' + followedUser.username)
   }
 
   async followers({ request }) {
@@ -110,9 +122,20 @@ class UserController {
     return userProfile
   }
 
-  async toggleFavorite({ request }) { }
+  async toggleFavorite({ request, response }) {
+    const artwork = await Artwork.find(request.input('artwork_id'))
+    const user = await User.find(request.input('user_id'))
 
-  async userInfo() { }
+    if (await user.favorites().where('id', artwork.id).first()) {
+      await user.favorites().detach([artwork.id])
+      return response.send('Quitaste esta obra de favoritos')
+    }
+    await user.favorites().attach([artwork.id])
+    return response.send('Añadiste esta obra a favoritos')
+  }
+
+  // No recuerdo para que iba a ser esta madre
+  //async userInfo() { }
 }
 
 module.exports = UserController

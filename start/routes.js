@@ -52,3 +52,6 @@ Route.get('tags/:params','TagController.index')
 // PAGE
 Route.post(':username', 'UserController.show')
 Route.post('user/artworks', 'UserController.artworks')
+Route.post('user/favorites', 'UserController.favorites')
+Route.post('user/favorites/toggle', 'UserController.toggleFavorite')
+Route.post('user/follow', 'UserController.follow')
