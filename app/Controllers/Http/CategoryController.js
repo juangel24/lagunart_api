@@ -8,7 +8,8 @@ class CategoryController {
 	}
 
 	async subcategories(){
-		return Subcategory.query().fetch()
+		const subcat = await Subcategory.query().fetch()
+		return {subcat}
 	}
 }
 
