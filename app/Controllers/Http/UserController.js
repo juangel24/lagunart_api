@@ -5,8 +5,24 @@ const Db = use('Database')
 
 class UserController {
   async artworks({ request }) {
-    //const { user_id, category, subcategory } = request.all()
-    //let query = User.find(user_id).artworks()
+    const { artist_id, category_id, subcategory_id, notIn } = request.all()
+
+    const query = Artwork.query().select('artworks.*')
+      .join('art_subcategories', 'artworks.art_subcategory_id', 'art_subcategories.id')
+      .join('art_categories', 'art_subcategories.art_categories_id', 'art_categories.id')
+      .where('artworks.user_id', artist_id)
+
+    if (category_id) {
+      query.andWhere('art_categories.id', category_id)
+    }
+    if (subcategory_id) {
+      query.andWhere('artworks.art_subcategory_id', subcategory_id)
+    }
+    if (notIn) {
+      query.whereNotIn('artworks.id', notIn)
+    }
+
+    return await query.limit(10).orderBy('artworks.updated_at', 'desc').fetch()
   }
 
   async favorites({ request }) {
@@ -57,9 +73,9 @@ class UserController {
       'art_subcategories.id as subcategory_id',
       'art_subcategories.subcategory'
     ).from('art_categories')
-      .innerJoin('art_subcategories', 'art_categories.id', 'art_subcategories.art_categories_id')
-      .innerJoin('artworks', 'art_subcategories.id', 'artworks.art_subcategory_id')
-      .innerJoin('users', 'artworks.user_id', 'users.id')
+      .join('art_subcategories', 'art_categories.id', 'art_subcategories.art_categories_id')
+      .join('artworks', 'art_subcategories.id', 'artworks.art_subcategory_id')
+      .join('users', 'artworks.user_id', 'users.id')
       .where('users.id', userProfile.id)
       .groupBy('art_subcategories.id')
 

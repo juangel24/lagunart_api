@@ -50,4 +50,5 @@ Route.post('notifications/modify', 'NotificationController.update')
 Route.get('tags/:params','TagController.index')
 
 // PAGE
-Route.get(':username', 'UserController.show')
+Route.post(':username', 'UserController.show')
+Route.post('user/artworks', 'UserController.artworks')
