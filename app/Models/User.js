@@ -7,7 +7,7 @@ const Model = use('Model')
 const Hash = use('Hash')
 
 class User extends Model {
-  static boot () {
+  static boot() {
     super.boot()
 
     /**
@@ -21,7 +21,7 @@ class User extends Model {
     })
   }
 
-  static get hidden () { return ['password'] }
+  static get hidden() { return ['password'] }
 
   /**
    * A relationship on tokens is required for auth to
@@ -33,19 +33,24 @@ class User extends Model {
    *
    * @return {Object}
    */
-  tokens () {
+
+  artworks() {
+    return this.hasMany('App/Models/Artwork')
+  }
+
+  tokens() {
     return this.hasMany('App/Models/Token')
   }
 
-  user_notifications(){
+  user_notifications() {
     return this.belongsToMany('App/Models/Notification').pivotTable('notification_receivers').withPivot(['is_viewed'])
   }
 
-  events(){
+  events() {
     return this.hasMany('App/Models/Event')
   }
 
-  user_events(){
+  user_events() {
     return this.belongsToMany('App/Models/Event').pivotTable('user_events')
   }
 
@@ -54,30 +59,26 @@ class User extends Model {
   }
 
   following() {
-    return this.belongsToMany('App/Models/User', 'follower', 'user_id').pivotTable('followers')
+    return this.belongsToMany('App/Models/User', 'follower').pivotTable('followers')
   }
 
-  sendmsg(){
-    return this.hasMany('App/Models/Message','id','sender_id')
+  sendmsg() {
+    return this.hasMany('App/Models/Message', 'id', 'sender_id')
   }
 
-  recivmsg(){
-    return this.hasMany('App/Models/Message','id','receiver_id')
+  recivmsg() {
+    return this.hasMany('App/Models/Message', 'id', 'receiver_id')
   }
 
-  artworks(){
-    return this.hasMany('App/Models/Artwork','id','user_id')
-  }
-
-  congratulations(){
+  congratulations() {
     return this.belongsToMany('App/Models/Artwork').pivotTable('congratulations')
   }
 
-  favorites(){
+  favorites() {
     return this.belongsToMany('App/Models/Artwork').pivotTable('user_favorites')
   }
 
-  comments(){
+  comments() {
     return this.hasMany('App/Models/Comment', 'id', 'user_id')
   }
 }
