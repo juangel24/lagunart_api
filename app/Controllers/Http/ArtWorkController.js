@@ -14,7 +14,7 @@ const { validate } = use('Validator')
 
 class ArtWorkController {
   async index({ /*auth*/ response }) {
-    let index = await Database.select('users.username', 'artworks.tittle', 'artworks.description',
+    let index = await Database.select('users.username', 'artworks.title', 'artworks.description',
       'art_categories.category', 'art_subcategories.subcategory', 'artworks.is_adult_content',
       'artworks.views', 'artworks.is_private', 'artworks.path_img')
       .from('art_categories')
