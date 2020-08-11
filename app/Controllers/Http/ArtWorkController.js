@@ -14,9 +14,7 @@ const { validate } = use('Validator')
 
 class ArtWorkController {
   async index({ /*auth*/ response }) {
-    let index = await Database.select('users.username', 'artworks.title', 'artworks.description',
-      'art_categories.category', 'art_subcategories.subcategory', 'artworks.is_adult_content',
-      'artworks.views', 'artworks.is_private', 'artworks.path_img')
+    let index = await Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
       .from('art_categories')
       .innerJoin('art_subcategories', 'art_subcategories.art_categories_id', 'art_categories.id')
       .innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
@@ -125,13 +123,13 @@ class ArtWorkController {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
-
+    
     const comment = new Comment()
     comment.content = request.input('content')
     comment.user_id = user.id
     comment.artwork_id = artwork.id
     comment.save()
-   
+ 
     return response.json(comment)
   }
   
