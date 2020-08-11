@@ -17,6 +17,8 @@ Route.get('logout', 'AuthController.logout').middleware('auth')
 Route.post('password/reset/mail', 'AuthController.sendResetMail')
 Route.post('password/reset', 'AuthController.resetPassword')
 
+Route.post('home', 'UserController.home')
+
 Route.get('artworks', 'ArtWorkController.index')
 Route.post('artwork/create', 'ArtWorkController.store')
 Route.post('create/artwork/chapter/:id', 'ArtWorkController.chapter')
@@ -53,3 +55,6 @@ Route.get('tags/:params', 'TagController.index')
 // PAGE
 Route.post(':username', 'UserController.show')
 Route.post('user/artworks', 'UserController.artworks')
+Route.post('user/favorites', 'UserController.favorites')
+Route.post('user/favorites/toggle', 'UserController.toggleFavorite')
+Route.post('user/follow', 'UserController.follow')
