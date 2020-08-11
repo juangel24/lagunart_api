@@ -123,13 +123,13 @@ class ArtWorkController {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
-
+    
     const comment = new Comment()
     comment.content = request.input('content')
     comment.user_id = user.id
     comment.artwork_id = artwork.id
     comment.save()
-   
+ 
     return response.json(comment)
   }
   

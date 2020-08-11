@@ -42,6 +42,7 @@ Route.get('search/artworks/user/:params/:id', 'SearchController.user')
 
 Route.get('categories', 'CategoryController.categories')
 Route.get('subcategories', 'CategoryController.subcategories')
+Route.get('categories/subcategories/:id', 'CategoryController.getSubcategories')
 
 Route.get('notifications/:id', 'NotificationController.index')
 Route.post('notifications/modify', 'NotificationController.update')
