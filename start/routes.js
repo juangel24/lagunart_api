@@ -17,6 +17,8 @@ Route.get('logout', 'AuthController.logout').middleware('auth')
 Route.post('password/reset/mail', 'AuthController.sendResetMail')
 Route.post('password/reset', 'AuthController.resetPassword')
 
+Route.post('home', 'UserController.home')
+
 Route.get('artworks', 'ArtWorkController.index')
 Route.post('artwork/create', 'ArtWorkController.store')
 Route.post('create/artwork/chapter/:id', 'ArtWorkController.chapter')

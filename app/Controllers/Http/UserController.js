@@ -19,11 +19,9 @@ class UserController {
     if (subcategory_id) {
       query.andWhere('artworks.art_subcategory_id', subcategory_id)
     }
-    if (notIn) {
-      query.whereNotIn('artworks.id', notIn)
-    }
+    if (notIn) { query.whereNotIn('artworks.id', notIn) }
 
-    return await query.limit(10).orderBy('artworks.updated_at', 'desc').fetch()
+    return await query.limit(20).orderBy('artworks.updated_at', 'desc').fetch()
   }
 
   async favorites({ request }) {
@@ -54,6 +52,22 @@ class UserController {
   async following({ request }) {
     const user = await User.find(request.input('user_id'))
     return await user.following().fetch()
+  }
+
+  async home({ request }) {
+    const { artNotIn, user_id } = request.all()
+    const user = await User.find(user_id)
+    const followingUsers = await user.following().ids()
+
+    let artworks = Artwork.query().select('artworks.*', 'users.username', 'users.profile_img')
+      .join('art_subcategories', 'artworks.art_subcategory_id', 'art_subcategories.id')
+      .join('art_categories', 'art_subcategories.art_categories_id', 'art_categories.id')
+      .join('users', 'artworks.user_id', 'users.id')
+      .whereIn('users.id', followingUsers)
+
+    if (artNotIn) { artworks.whereNotIn('artworks.id', artNotIn) }
+
+    return await artworks.orderBy('artworks.updated_at', 'desc').fetch()
   }
 
   async show({ params, request, response }) {
