@@ -3,13 +3,18 @@
 const Category = use('App/Models/ArtCategory');
 const Subcategory = use('App/Models/ArtSubcategory');
 class CategoryController {
-	async categories(){
+	async categories() {
 		const catego = await Category.query().fetch()
-		return {catego}
+		return { catego }
 	}
-	async subcategories(){
+	async subcategories() {
 		const subcat = await Subcategory.query().fetch()
-		return {subcat}
+		return { subcat }
+	}
+	async getSubcategories({params}) {
+		const catego = await Category.findBy('id', params.id)
+		const subcat = await catego.subcategory().fetch()
+		return subcat
 	}
 }
 
