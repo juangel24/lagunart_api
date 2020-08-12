@@ -35,7 +35,7 @@ class ArtWorkController {
     artwork.art_subcategory_id = art_subcategory_id
     artwork.is_adult_content = is_adult_content
     artwork.user_id = user.id
-    artwork.views = 0
+
     artwork.is_private = is_private
         
     await artwork.save()
@@ -106,17 +106,19 @@ class ArtWorkController {
     const congratulate = await user.congratulations().save(artwork)
     return response.json(congratulate)
   }
-  async show({ auth, request }) {
-    const user = await auth.getUser()
-    const artwork_id = request.input('artwork_id')
+  async show({ request }) {
+    const artwork_id = request._raw
+    console.log(request)
     const artwork = await Artwork.find(artwork_id)
+    artwork.comments = await Comment.query().where('artwork_id', artwork.id).fetch()
+    artwork.commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
+    
+    artwork.congratulations = await Artwork.query().select("artworks.*", "congratulations.*").from('congratulations')
+      .innerJoin('artworks', 'artworks.id', 'congratulations.artwork_id')
+      .innerJoin('users', 'congratulations.user_id', 'users.id').fetch()
+    artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id',artwork.id).count()
 
-    const user_artwork = await Artwork.query().where('user_id', user.id).fetch()
-    const comments = await Comment.query().where('artwork_id', artwork.id).fetch()
-    const commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
-    const congratulates = await user.congratulations().where('artwork_id', artwork_id).fetch()
-    const congratulatesCount = await user.congratulations().where('artwork_id', artwork_id).getCount()
-    return { user_artwork, comments, commentsCount, congratulates, congratulatesCount }
+    return { artwork }
   }
 
   async comment({ auth, request, params, response }) {
