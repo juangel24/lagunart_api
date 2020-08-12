@@ -30,7 +30,7 @@ Route.post('artworks/show', 'ArtWorkController.show')
 Route.post('event/create', 'EventController.store')
 Route.patch('event/update', 'EventController.update')
 Route.delete('event/delete/:id', 'EventController.destroy')
-//COMMENTS
+//COMMENTS 
 Route.post('comment/artwork', 'ArtWorkController.comment')
 //Route.get('comment/artwork','ArtWorkController.showcomment')
 
