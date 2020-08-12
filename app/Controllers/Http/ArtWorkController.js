@@ -13,24 +13,15 @@ const Helpers = use('Helpers');
 const { validate } = use('Validator')
 
 class ArtWorkController {
-  async index({ request }) {
-    const { category_id, subcategory_id, notIn } = request.all()
-    const quwey = await Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
+  async index({ /*auth*/ response }) {
+    let index = await Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
       .from('art_categories')
       .innerJoin('art_subcategories', 'art_subcategories.art_categories_id', 'art_categories.id')
       .innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
       .innerJoin('users', 'users.id', 'artworks.user_id')
-    
-      if (category_id) {
-        query.andWhere('art_categories.id', category_id)
-      }
-      if (subcategory_id) {
-        query.andWhere('artworks.art_subcategory_id', subcategory_id)
-      }
-      if (notIn) {
-        query.whereNotIn('artworks.id', notIn)
-      }
-    return await query.limit(10).orderBy('artworks.updated_at', 'desc').fetch()
+      .orderBy('artworks.id', 'desc')
+      .limit(20);
+    return response.json(index);
   }
 
   async store({ auth, request, response }) {
@@ -46,7 +37,7 @@ class ArtWorkController {
     artwork.user_id = user.id
     artwork.views = 0
     artwork.is_private = is_private
-    
+        
     await artwork.save()
     console.log(artwork);
     return response.json(artwork)
@@ -115,19 +106,19 @@ class ArtWorkController {
     const congratulate = await user.congratulations().save(artwork)
     return response.json(congratulate)
   }
-  async show({ request }) {
+  async show({ auth, request }) {
+    const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
-    artwork.comments = await Comment.query().where('artwork_id', artwork.id).fetch()
-    artwork.commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
-    
-    artwork.congratulations = await Artwork.query().select("artworks.*", "congratulations.*").from('congratulations')
-      .innerJoin('artworks', 'artworks.id', 'congratulations.artwork_id')
-      .innerJoin('users', 'congratulations.user_id', 'users.id').fetch()
-    artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id', artwork.id).count()
 
-    return { artwork }
+    const user_artwork = await Artwork.query().where('user_id', user.id).fetch()
+    const comments = await Comment.query().where('artwork_id', artwork.id).fetch()
+    const commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
+    const congratulates = await user.congratulations().where('artwork_id', artwork_id).fetch()
+    const congratulatesCount = await user.congratulations().where('artwork_id', artwork_id).getCount()
+    return { user_artwork, comments, commentsCount, congratulates, congratulatesCount }
   }
+
   async comment({ auth, request, params, response }) {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
