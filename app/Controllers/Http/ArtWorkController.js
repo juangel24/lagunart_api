@@ -108,7 +108,7 @@ class ArtWorkController {
   }
   async show({ request }) {
     const artwork_id = request._raw
-    console.log(request)
+    // console.log(request)
     const artwork = await Artwork.find(artwork_id)
     artwork.comments = await Comment.query().where('artwork_id', artwork.id).fetch()
     artwork.commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
