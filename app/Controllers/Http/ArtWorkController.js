@@ -124,7 +124,9 @@ class ArtWorkController {
     artwork.congratulations = await Artwork.query().select("artworks.*", "congratulations.*").from('congratulations')
       .innerJoin('artworks', 'artworks.id', 'congratulations.artwork_id')
       .innerJoin('users', 'congratulations.user_id', 'users.id').fetch()
-    artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id',artwork.id).count()
+    artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id',artwork.id).getCount()
+
+    artwork.chapter = await artwork.chapters().where('artwork_id', artwork.id).fetch()
 
     return { artwork }
   }
