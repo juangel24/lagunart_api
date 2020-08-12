@@ -46,7 +46,7 @@ class ArtWorkController {
     artwork.user_id = user.id
     artwork.views = 0
     artwork.is_private = is_private
-        
+    
     await artwork.save()
     console.log(artwork);
     return response.json(artwork)
@@ -124,12 +124,10 @@ class ArtWorkController {
     artwork.congratulations = await Artwork.query().select("artworks.*", "congratulations.*").from('congratulations')
       .innerJoin('artworks', 'artworks.id', 'congratulations.artwork_id')
       .innerJoin('users', 'congratulations.user_id', 'users.id').fetch()
-    artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id',artwork.id).count()
-
+    artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id', artwork.id).count()
 
     return { artwork }
   }
-
   async comment({ auth, request, params, response }) {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
