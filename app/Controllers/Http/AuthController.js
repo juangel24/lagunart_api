@@ -13,11 +13,11 @@ class AuthController {
 
     // if username is already taken
     let user = await User.findBy('username', data.username)
-    if (user) { return response.conflict('usuario') }
+    if (user) { return response.conflict('username') }
 
     // if email already exists
     user = await User.findBy('email', data.email)
-    if (user) { return response.conflict('correo') }
+    if (user) { return response.conflict('email') }
 
     user = await User.create(data)
     return this._userWithToken(auth, user)
