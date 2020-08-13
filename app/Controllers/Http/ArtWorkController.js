@@ -44,9 +44,9 @@ class ArtWorkController {
     artwork.art_subcategory_id = art_subcategory_id
     artwork.is_adult_content = is_adult_content
     artwork.user_id = user.id
-    artwork.views = 0
+
     artwork.is_private = is_private
-    
+        
     await artwork.save()
     console.log(artwork);
     return response.json(artwork)
@@ -124,10 +124,13 @@ class ArtWorkController {
     artwork.congratulations = await Artwork.query().select("artworks.*", "congratulations.*").from('congratulations')
       .innerJoin('artworks', 'artworks.id', 'congratulations.artwork_id')
       .innerJoin('users', 'congratulations.user_id', 'users.id').fetch()
-    artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id', artwork.id).count()
+    artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id',artwork.id).getCount()
+
+    artwork.chapter = await artwork.chapters().where('artwork_id', artwork.id).fetch()
 
     return { artwork }
   }
+
   async comment({ auth, request, params, response }) {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
