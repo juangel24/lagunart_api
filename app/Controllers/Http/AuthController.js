@@ -6,18 +6,18 @@ const jwt = require('jsonwebtoken')
 const Mail = use('Mail')
 
 class AuthController {
-  async join({ auth, request }) {
+  async join({ auth, request, response }) {
     const data = request.only([
       'birth', 'email', 'name', 'password', 'username'
     ])
 
     // if username is already taken
     let user = await User.findBy('username', data.username)
-    if (user) return { message: 'username taken' }
+    if (user) { return response.conflict('username') }
 
     // if email already exists
     user = await User.findBy('email', data.email)
-    if (user) return { message: 'email taken' }
+    if (user) { return response.conflict('email') }
 
     user = await User.create(data)
     return this._userWithToken(auth, user)
@@ -34,7 +34,7 @@ class AuthController {
 
   async logout() { await auth.logout() }
 
-  async sendResetMail({ auth, request }) {
+  async sendResetMail({ request }) {
     const email = request.input('email')
     const user = await User.findBy('email', email)
 
