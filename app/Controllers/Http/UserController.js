@@ -59,15 +59,25 @@ class UserController {
     const user = await User.find(user_id)
     const followingUsers = await user.following().ids()
 
-    let artworks = Artwork.query().select('artworks.*', 'users.username', 'users.profile_img')
+    let artworks = Artwork.query().select(
+        'artworks.*',
+        'users.username',
+        'users.profile_img'
+      ).select(Db.raw(
+        'COUNT(congratulations.artwork_id) AS congratulations, '+
+        'COUNT(comments.id) AS comments'
+        ))
       .join('art_subcategories', 'artworks.art_subcategory_id', 'art_subcategories.id')
       .join('art_categories', 'art_subcategories.art_categories_id', 'art_categories.id')
       .join('users', 'artworks.user_id', 'users.id')
+      .leftJoin('congratulations', 'artworks.id', 'congratulations.artwork_id')
+      .leftJoin('comments', 'artworks.id', 'comments.artwork_id')
       .whereIn('users.id', followingUsers)
 
     if (artNotIn) { artworks.whereNotIn('artworks.id', artNotIn) }
 
-    return await artworks.orderBy('artworks.updated_at', 'desc').fetch()
+    return await artworks.orderBy('artworks.updated_at', 'desc')
+    .groupBy('artworks.id').fetch()
   }
 
   async show({ params, request, response }) {
