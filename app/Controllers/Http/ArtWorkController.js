@@ -58,6 +58,14 @@ class ArtWorkController {
     const artworks = await findUser.artworks().last()
     return { artworks }
   }
+  
+  async showInfoToEdit({auth}) {
+    const user = await auth.getUser()
+    const findUser = await User.find(user.id)
+    const artworks = await findUser.artworks().last()
+    return { artworks }
+  }
+
   async update({ request }) {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
@@ -170,30 +178,7 @@ class ArtWorkController {
     await artwork.delete()
     return response.json({ message: 'Se eliminó la obra' })
   }
-  async tags({ request, response }) {
-    const tag = new Tags()
-    /*const tag_id = request.input('tag_id')
-    tag = await Tags.find(tag_id)*/
-    /*const artwork_id = request.input('artwork_id')
-    const artwork = await Artwork.find(artwork_id)*/
-    const { name } = request.all()
-    tag.name =  name 
-   
-    const data = await Tags.query().fetch()
-    const x = data.rows
-      for (let i = 0; i < x.length; i++) {
-        if (tag.name == x[i].name) {
-          console.log(x[i])
-          return "Ya existe esa etiqueta"
-        }
-    }
-    //await artwork.tags().detach(tag)
-     await tag.save()
-    //const tag_id = await tag.findBy(adonis serx.id)
-    //await artwork.tags().save(tag)
-    return response.json(tag)
-    //return {artwork, chapter_artwork }
-  }
+
 }
 
 module.exports = ArtWorkController
