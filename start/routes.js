@@ -36,7 +36,8 @@ Route.post('comment/artwork', 'ArtWorkController.comment')
 
 //LIKES
 Route.post('artwork/like', 'ArtWorkController.congratulate')
-Route.post('/pruebon', 'ArtWorkController.tags')
+// Route.post('/pruebon', 'ArtWorkController.tags')
+Route.post('/tags', 'ArtWorkController.tags')
 
 
 Route.get('search/home/:params', 'SearchController.home')

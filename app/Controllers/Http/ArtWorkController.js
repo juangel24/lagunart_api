@@ -108,9 +108,15 @@ class ArtWorkController {
   }
   async show({ request }) {
     const artwork_id = request._raw
-    // console.log(request)
+    // console.log(request._raw)
     const artwork = await Artwork.find(artwork_id)
-    artwork.comments = await Comment.query().where('artwork_id', artwork.id).fetch()
+    artwork.user = await Artwork.query().select('users.username', 'users.profile_img').from ('users')
+      .innerJoin('artworks', 'artworks.user_id', 'users.id')
+      .where('artworks.id', request._raw).fetch()
+
+    artwork.comments = await Comment.query().select('comments.*', 'users.username', 'users.profile_img', 'users.cover_img').from('users')
+      .innerJoin('comments', 'comments.user_id', 'users.id')
+      .where('artwork_id', artwork.id).fetch()
     artwork.commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
     
     artwork.congratulations = await Artwork.query().select("artworks.*", "congratulations.*").from('congratulations')
@@ -157,6 +163,7 @@ class ArtWorkController {
     /*const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)*/
     const { name } = request.all()
+    console.log(request.all());
     tag.name =  name 
    
     const data = await Tags.query().fetch()

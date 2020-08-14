@@ -7,8 +7,9 @@ const Db = use('Database')
 class UserController {
   async artworks({ request }) {
     const { artist_id, category_id, subcategory_id, notIn } = request.all()
+    // console.log(request.all());
 
-    const query = Artwork.query().select('artworks.*')
+    const query = Artwork.query().select('artworks.*', 'art_subcategories.subcategory', 'art_categories.category')
       .join('art_subcategories', 'artworks.art_subcategory_id', 'art_subcategories.id')
       .join('art_categories', 'art_subcategories.art_categories_id', 'art_categories.id')
       .where('artworks.user_id', artist_id)

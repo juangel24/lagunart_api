@@ -3,6 +3,7 @@
 const Artwork = use('App/Models/Artwork');
 const Event = use('App/Models/Event');
 const User = use('App/Models/User')
+const Db = use('Database')
 class SearchController {
 	async home({params}){
 		const palabra = params.params
@@ -26,7 +27,18 @@ class SearchController {
 		const eventos = await usuario.events().whereRaw('tittle like ?', busqueda).fetch()
 		const artworks = await usuario.artworks().whereRaw('title like ?', busqueda).fetch()
 
-		return {artworks, eventos}
+		// Categories of art posted by user
+		const userArtCategories = await Db.select(
+			'art_categories.*',
+			'art_subcategories.*'
+		  ).from('art_categories')
+			.join('art_subcategories', 'art_categories.id', 'art_subcategories.art_categories_id')
+			.join('artworks', 'art_subcategories.id', 'artworks.art_subcategory_id')
+			.join('users', 'artworks.user_id', 'users.id')
+			.where('users.id', usuario.id)
+			.groupBy('art_subcategories.id')
+
+		return {artworks, eventos, userArtCategories}
 	}
 }
 
