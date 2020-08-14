@@ -22,10 +22,10 @@ class ArtWorkController {
       .innerJoin('users', 'users.id', 'artworks.user_id')
     
       if (category_id) {
-        query.andWhere('art_categories.id', category_id)
+        query.andWhere('art_categories.category', category_id)
       }
       if (subcategory_id) {
-        query.andWhere('artworks.art_subcategory_id', subcategory_id)
+        query.andWhere('art_subcategories.subcategory', subcategory_id)
       }
       if (notIn) {
         query.whereNotIn('artworks.id', notIn)
