@@ -13,20 +13,40 @@ const Helpers = use('Helpers');
 const { validate } = use('Validator')
 
 class ArtWorkController {
+<<<<<<< HEAD
   async index({ /*auth*/ response }) {
     let index = await Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
+=======
+  async index({ request }) {
+    const { category_id, subcategory_id, notIn } = request.all()
+
+    const query = Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
+>>>>>>> 63dfdbf2a1d18a29f419cde0d91edff6d13ed50a
       .from('art_categories')
       .innerJoin('art_subcategories', 'art_subcategories.art_categories_id', 'art_categories.id')
       .innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
       .innerJoin('users', 'users.id', 'artworks.user_id')
+<<<<<<< HEAD
       .orderBy('artworks.id', 'desc')
       .limit(20);
     return response.json(index);
+=======
+    
+      if (category_id) {
+        query.andWhere('art_categories.category', category_id)
+      }
+      if (subcategory_id) {
+        query.andWhere('art_subcategories.subcategory', subcategory_id)
+      }
+      if (notIn) {
+        query.whereNotIn('artworks.id', notIn)
+      }
+    return await query.orderBy('artworks.updated_at', 'desc').limit(10)
+>>>>>>> 63dfdbf2a1d18a29f419cde0d91edff6d13ed50a
   }
 
   async store({ auth, request, response }) {
     const user = await auth.getUser();
-
     const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
     
     const artwork = new Artwork()
@@ -41,29 +61,49 @@ class ArtWorkController {
     await artwork.save()
     console.log(artwork);
     return response.json(artwork)
+    
+  }
+  async showInfoToEdit({auth}) {
+    const user = await auth.getUser()
+    const findUser = await User.find(user.id)
+    const artworks = await findUser.artworks().last()
+    return { artworks }
+  }
+  
+  async showInfoToEdit({auth}) {
+    const user = await auth.getUser()
+    const findUser = await User.find(user.id)
+    const artworks = await findUser.artworks().last()
+    return { artworks }
   }
 
   async update({ request }) {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
-
     const { title, description, is_adult_content } = request.all()
+    
     const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
     const coverImg = request.file('path_img', validationOptions)
-    await coverImg.move(Helpers.tmpPath('artwork'), { name: 'artwork' + Math.random() + '.' + coverImg.clientName, overwrite: true })
-    const name = await 'artwork' + Math.random() + '.' + coverImg.clientName
+    const name = 'artwork' + Math.random() + '.' + coverImg.clientName
+    await coverImg.move(Helpers.tmpPath('artwork'), { name: name})
+  
+    const path = 'artwork/' + name
+    const unicorn = await Drive.get(path)
+    const imagen = Buffer.from(unicorn).toString('base64')
     
     artwork.title = title
     artwork.description = description
-    artwork.path_img = name
+    artwork.path_img = path
     artwork.is_adult_content = is_adult_content
     artwork.save()
     
     //ADD CHAPTER TO ARTWORK
     const chapter_artwork = await artwork.chapters().first()
-    const { tittle, content, name2 } = request.all()
-    chapter_artwork.tittle = tittle
+    const { title_chapter, content, name2 } = request.all()
+    chapter_artwork.tittle = title_chapter
     chapter_artwork.content = content
+    chapter_artwork.artwork_id = artwork
+
     chapter_artwork.save()
 
     //ADD TAGS TO ARTWORK
@@ -77,7 +117,6 @@ class ArtWorkController {
         return "Ya existe esa etiqueta"
       }
     }
-    //await artwork.tags().detach(tag)
     await artwork.tags().save(tag)
     return {artwork, chapter_artwork, tag }
   }
@@ -129,6 +168,7 @@ class ArtWorkController {
     return { artwork }
   }
 
+
   async comment({ auth, request, params, response }) {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
@@ -156,6 +196,7 @@ class ArtWorkController {
     await artwork.delete()
     return response.json({ message: 'Se eliminó la obra' })
   }
+<<<<<<< HEAD
   async tags({ request, response }) {
     const tag = new Tags()
     /*const tag_id = request.input('tag_id')
@@ -181,6 +222,9 @@ class ArtWorkController {
     return response.json(tag)
     //return {artwork, chapter_artwork }
   }
+=======
+
+>>>>>>> 63dfdbf2a1d18a29f419cde0d91edff6d13ed50a
 }
 
-  module.exports = ArtWorkController
+module.exports = ArtWorkController
