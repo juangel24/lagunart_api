@@ -51,7 +51,12 @@ class ArtWorkController {
     console.log(artwork);
     return response.json(artwork)
   }
-
+  async showInfoToEdit({auth}) {
+    const user = await auth.getUser()
+    const findUser = await User.find(user.id)
+    const artworks = await findUser.artworks().last()
+    return { artworks }
+  }
   async update({ request }) {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
