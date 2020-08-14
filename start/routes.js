@@ -18,15 +18,15 @@ Route.post('password/reset/mail', 'AuthController.sendResetMail')
 Route.post('password/reset', 'AuthController.resetPassword')
 
 Route.post('home', 'UserController.home')
+Route.get('usuarios', 'UserController.getusers')
 
-Route.get('artworks', 'ArtWorkController.index')
+Route.post('artworks', 'ArtWorkController.index')
 Route.post('artwork/create', 'ArtWorkController.store').middleware('auth')
 Route.post('create/artwork/chapter/:id', 'ArtWorkController.chapter')
 Route.patch('artwork/update', 'ArtWorkController.update')
 Route.delete('artwork/delete/:id', 'ArtWorkController.destroy')
 Route.post('artworks/show', 'ArtWorkController.show')
 Route.get('showinfo', 'ArtworkController.showInfoToEdit')
-
 
 //EVENTS
 Route.post('event/create', 'EventController.store')

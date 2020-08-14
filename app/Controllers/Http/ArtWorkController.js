@@ -15,22 +15,23 @@ const { validate } = use('Validator')
 class ArtWorkController {
   async index({ request }) {
     const { category_id, subcategory_id, notIn } = request.all()
-    const query = Database.select('users.username', 'artworks.*', 'art_subcategories.*', 'art_categories.*')
+
+    const query = Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
       .from('art_categories')
       .innerJoin('art_subcategories', 'art_subcategories.art_categories_id', 'art_categories.id')
       .innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
       .innerJoin('users', 'users.id', 'artworks.user_id')
     
       if (category_id) {
-        query.andWhere('art_categories.id', category_id)
+        query.andWhere('art_categories.category', category_id)
       }
       if (subcategory_id) {
-        query.andWhere('artworks.art_subcategory_id', subcategory_id)
+        query.andWhere('art_subcategories.subcategory', subcategory_id)
       }
       if (notIn) {
         query.whereNotIn('artworks.id', notIn)
       }
-    return await query.limit(10).orderBy('artworks.updated_at', 'desc').fetch()
+    return await query.orderBy('artworks.updated_at', 'desc').limit(10)
   }
 
   async store({ auth, request, response }) {

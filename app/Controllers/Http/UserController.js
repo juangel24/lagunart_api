@@ -148,6 +148,12 @@ class UserController {
     return response.send('Añadiste esta obra a favoritos')
   }
 
+  //to lo hizo el ioni, cualquier queja o sugerencia, métacla por el clo >:v
+  async getusers(){
+    const users = await User.query().fetch()
+    return users
+  }
+
   // No recuerdo para que iba a ser esta madre
   //async userInfo() { }
 }
