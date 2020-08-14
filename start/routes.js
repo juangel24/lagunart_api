@@ -25,6 +25,8 @@ Route.post('create/artwork/chapter/:id', 'ArtWorkController.chapter')
 Route.patch('artwork/update', 'ArtWorkController.update')
 Route.delete('artwork/delete/:id', 'ArtWorkController.destroy')
 Route.post('artworks/show', 'ArtWorkController.show')
+Route.get('showinfo', 'ArtworkController.showInfoToEdit')
+
 
 //EVENTS
 Route.post('event/create', 'EventController.store')
@@ -36,7 +38,7 @@ Route.post('comment/artwork', 'ArtWorkController.comment')
 
 //LIKES
 Route.post('artwork/like', 'ArtWorkController.congratulate')
-Route.post('/pruebon', 'ArtWorkController.tags')
+//Route.post('/pruebon', 'ArtWorkController.tags')
 
 
 Route.get('search/home/:params', 'SearchController.home')

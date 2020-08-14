@@ -15,7 +15,7 @@ const { validate } = use('Validator')
 class ArtWorkController {
   async index({ request }) {
     const { category_id, subcategory_id, notIn } = request.all()
-    const quwey = await Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
+    const query = Database.select('users.username', 'artworks.*', 'art_subcategories.*', 'art_categories.*')
       .from('art_categories')
       .innerJoin('art_subcategories', 'art_subcategories.art_categories_id', 'art_categories.id')
       .innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
@@ -35,7 +35,6 @@ class ArtWorkController {
 
   async store({ auth, request, response }) {
     const user = await auth.getUser();
-
     const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
     
     const artwork = new Artwork()
@@ -50,29 +49,41 @@ class ArtWorkController {
     await artwork.save()
     console.log(artwork);
     return response.json(artwork)
+    
   }
-
+  async showInfoToEdit({auth}) {
+    const user = await auth.getUser()
+    const findUser = await User.find(user.id)
+    const artworks = await findUser.artworks().last()
+    return { artworks }
+  }
   async update({ request }) {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
-
     const { title, description, is_adult_content } = request.all()
+    
     const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
     const coverImg = request.file('path_img', validationOptions)
-    await coverImg.move(Helpers.tmpPath('artwork'), { name: 'artwork' + Math.random() + '.' + coverImg.clientName, overwrite: true })
-    const name = await 'artwork' + Math.random() + '.' + coverImg.clientName
+    const name = 'artwork' + Math.random() + '.' + coverImg.clientName
+    await coverImg.move(Helpers.tmpPath('artwork'), { name: name})
+  
+    const path = 'artwork/' + name
+    const unicorn = await Drive.get(path)
+    const imagen = Buffer.from(unicorn).toString('base64')
     
     artwork.title = title
     artwork.description = description
-    artwork.path_img = name
+    artwork.path_img = path
     artwork.is_adult_content = is_adult_content
     artwork.save()
     
     //ADD CHAPTER TO ARTWORK
     const chapter_artwork = await artwork.chapters().first()
-    const { tittle, content, name2 } = request.all()
-    chapter_artwork.tittle = tittle
+    const { title_chapter, content, name2 } = request.all()
+    chapter_artwork.tittle = title_chapter
     chapter_artwork.content = content
+    chapter_artwork.artwork_id = artwork
+
     chapter_artwork.save()
 
     //ADD TAGS TO ARTWORK
@@ -86,7 +97,6 @@ class ArtWorkController {
         return "Ya existe esa etiqueta"
       }
     }
-    //await artwork.tags().detach(tag)
     await artwork.tags().save(tag)
     return {artwork, chapter_artwork, tag }
   }
@@ -130,6 +140,7 @@ class ArtWorkController {
 
     return { artwork }
   }
+
 
   async comment({ auth, request, params, response }) {
     const user = await auth.getUser()
@@ -184,4 +195,4 @@ class ArtWorkController {
   }
 }
 
-  module.exports = ArtWorkController
+module.exports = ArtWorkController

@@ -44,6 +44,10 @@ class ArtSubCategorySeeder {
         'art_categories_id': 2
       },
       {
+        'subcategory': 'Historias',
+        'art_categories_id': 2
+      },
+      {
         'subcategory': 'Letras musicales',
         'art_categories_id': 2
       },
