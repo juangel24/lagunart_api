@@ -179,6 +179,15 @@ class ArtWorkController {
     return response.json(tag)
     //return {artwork, chapter_artwork }
   }
+
+  async allartworks(){
+    const quwey = await Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
+      .from('art_categories')
+      .innerJoin('art_subcategories', 'art_subcategories.art_categories_id', 'art_categories.id')
+      .innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
+      .innerJoin('users', 'users.id', 'artworks.user_id')
+    return quwey
+  }
 }
 
   module.exports = ArtWorkController
