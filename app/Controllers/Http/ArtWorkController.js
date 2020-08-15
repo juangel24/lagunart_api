@@ -87,7 +87,7 @@ class ArtWorkController {
     artwork.save()
     
     //ADD CHAPTER TO ARTWORK
-    const chapter_artwork = await artwork.chapters().first()
+    const chapter_artwork =  artwork.chapters().first()
     const { title_chapter, content, name2 } = request.all()
     chapter_artwork.tittle = title_chapter
     chapter_artwork.content = content
@@ -178,7 +178,28 @@ class ArtWorkController {
     await artwork.delete()
     return response.json({ message: 'Se eliminó la obra' })
   }
+  async tags({ request, response }) {
+    const { name } = request.all()
+    const tag = new Tags()
+    const data = await Tags.query().fetch()
+    for (let i = 0; tag.length; i++) {
+      if (data) {
+        return "Ya existe esa etiqueta"
+      } else {
+        tag.name = name
+      }
+    }
+    console.log(data.rows);
+    //return data
 
+    tag.save()
+    console.log(tag);
+    return response.json(tag)
+    await artwork.tags().save(tag)
+    await artwork.save()
+    console.log(artwork);
+    return response.json(artwork)
+  }
 }
 
 module.exports = ArtWorkController
