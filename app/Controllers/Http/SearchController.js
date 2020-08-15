@@ -2,7 +2,8 @@
 
 const Artwork = use('App/Models/Artwork');
 const Event = use('App/Models/Event');
-const User = use('App/Models/User')
+const User = use('App/Models/User');
+const ArtSubcategory = use('App/Models/ArtSubcategory');
 class SearchController {
 	async home({params}){
 		const palabra = params.params
@@ -26,9 +27,15 @@ class SearchController {
 		const eventos = await usuario.events().whereRaw('tittle like ?', busqueda).fetch()
 		const artworks = await usuario.artworks().whereRaw('title like ?', busqueda).fetch()
 
-		const k = artworks.rows
+		const arts = artworks.rows
+
+		var subcatego = {}
+		for (var i = 0; i < arts.length; i++) {
+			subcatego = await ArtSubcategory.findBy('id', arts[i].art_subcategory_id)
+			arts[i].subcategory = subcatego
+		}
 		
-		return {artworks, eventos}
+		return {arts, eventos}
 	}
 }
 
