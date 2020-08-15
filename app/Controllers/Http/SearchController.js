@@ -26,6 +26,8 @@ class SearchController {
 		const eventos = await usuario.events().whereRaw('tittle like ?', busqueda).fetch()
 		const artworks = await usuario.artworks().whereRaw('title like ?', busqueda).fetch()
 
+		const k = artworks.rows
+		
 		return {artworks, eventos}
 	}
 }
