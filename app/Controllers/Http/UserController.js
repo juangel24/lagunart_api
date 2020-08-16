@@ -167,6 +167,30 @@ class UserController {
 
   // No recuerdo para que iba a ser esta madre
   //async userInfo() { }
+
+  async getRelatesImagesByTag({ request }) {
+    const { tag, artwork_id } = request.all()
+    console.log(tag);
+
+    try {
+
+      // const Artwork = await Artwork.query().select('*').where('artworks.id', 1).fetch()
+      const artworkOfUser = await Artwork.find(artwork_id)
+      console.log(artworkOfUser);
+      const ArtworksOfTag = await Db.select('artworks_has_tags.tag_id').from('artworks')
+        .join('')
+      // const ArtworksOfTag = await Artwork.query().select('*').from('artworks_has_tags')
+      //   .join('artworks_has_tags', 'artworks_has_tags.id', 'artworks.art_subcategory_id')
+      //   .where('art_subcategories.subcategory')
+      //   .limit(10).fetch()
+      // // console.log(ArtworksOfTag)
+      // ArtworksOfTag.rows.forEach(element => {
+      //   console.log(element);
+      // });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 module.exports = UserController

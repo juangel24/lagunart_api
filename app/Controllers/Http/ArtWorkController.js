@@ -13,24 +13,14 @@ const Helpers = use('Helpers');
 const { validate } = use('Validator')
 
 class ArtWorkController {
-<<<<<<< HEAD
-  async index({ /*auth*/ response }) {
-    let index = await Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
-=======
   async index({ request }) {
     const { category_id, subcategory_id, notIn } = request.all()
 
     const query = Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
->>>>>>> 63dfdbf2a1d18a29f419cde0d91edff6d13ed50a
       .from('art_categories')
       .innerJoin('art_subcategories', 'art_subcategories.art_categories_id', 'art_categories.id')
       .innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
       .innerJoin('users', 'users.id', 'artworks.user_id')
-<<<<<<< HEAD
-      .orderBy('artworks.id', 'desc')
-      .limit(20);
-    return response.json(index);
-=======
     
       if (category_id) {
         query.andWhere('art_categories.category', category_id)
@@ -42,7 +32,6 @@ class ArtWorkController {
         query.whereNotIn('artworks.id', notIn)
       }
     return await query.orderBy('artworks.updated_at', 'desc').limit(10)
->>>>>>> 63dfdbf2a1d18a29f419cde0d91edff6d13ed50a
   }
 
   async store({ auth, request, response }) {
@@ -78,7 +67,9 @@ class ArtWorkController {
   }
 
   async update({ request }) {
-    const artwork_id = request.input('artwork_id')
+    try {
+      const artwork_id = request.input('artwork_id')
+    console.log(artwork_id);
     const artwork = await Artwork.find(artwork_id)
     const { title, description, is_adult_content } = request.all()
     
@@ -119,6 +110,9 @@ class ArtWorkController {
     }
     await artwork.tags().save(tag)
     return {artwork, chapter_artwork, tag }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async chapter({ auth, request, response, params }) {
@@ -196,35 +190,6 @@ class ArtWorkController {
     await artwork.delete()
     return response.json({ message: 'Se eliminó la obra' })
   }
-<<<<<<< HEAD
-  async tags({ request, response }) {
-    const tag = new Tags()
-    /*const tag_id = request.input('tag_id')
-    tag = await Tags.find(tag_id)*/
-    /*const artwork_id = request.input('artwork_id')
-    const artwork = await Artwork.find(artwork_id)*/
-    const { name } = request.all()
-    console.log(request.all());
-    tag.name =  name 
-   
-    const data = await Tags.query().fetch()
-    const x = data.rows
-      for (let i = 0; i < x.length; i++) {
-        if (tag.name == x[i].name) {
-          console.log(x[i])
-          return "Ya existe esa etiqueta"
-        }
-    }
-    //await artwork.tags().detach(tag)
-     await tag.save()
-    //const tag_id = await tag.findBy(adonis serx.id)
-    //await artwork.tags().save(tag)
-    return response.json(tag)
-    //return {artwork, chapter_artwork }
-  }
-=======
-
->>>>>>> 63dfdbf2a1d18a29f419cde0d91edff6d13ed50a
 }
 
 module.exports = ArtWorkController
