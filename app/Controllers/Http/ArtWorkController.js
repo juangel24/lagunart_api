@@ -14,30 +14,50 @@ const { validate } = use('Validator')
 
 class ArtWorkController {
   async index({ request }) {
-    const { category_id, subcategory_id, notIn } = request.all()
+    const { artist_id, category_id, subcategory_id, notIn } = request.all()
 
-    const query = Database.select('users.username', 'artworks.*', 'art_subcategories.*','art_categories.*')
-      .from('art_categories')
-      .innerJoin('art_subcategories', 'art_subcategories.art_categories_id', 'art_categories.id')
-      .innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
-      .innerJoin('users', 'users.id', 'artworks.user_id')
-    
-      if (category_id) {
-        query.andWhere('art_categories.category', category_id)
-      }
-      if (subcategory_id) {
-        query.andWhere('art_subcategories.subcategory', subcategory_id)
-      }
-      if (notIn) {
-        query.whereNotIn('artworks.id', notIn)
-      }
-    return await query.orderBy('artworks.updated_at', 'desc').limit(10)
+    const query = Artwork.query().select(
+      'artworks.*',
+      'art_categories.id AS category_id',
+      'art_categories.category AS category',
+      'art_subcategories.id AS subcategory_id',
+      'art_subcategories.subcategory AS subcategory',
+      'users.id AS user_id',
+      'users.username')
+      .select(Database.raw(
+        'COUNT(congratulations.artwork_id) AS congratulations, '+
+        'COUNT(comments.id) AS comments'
+      ))
+      // categories info
+      .join('art_subcategories', 'artworks.art_subcategory_id', 'art_subcategories.id')
+      .join('art_categories', 'art_subcategories.art_categories_id', 'art_categories.id')
+      //
+      .leftJoin('congratulations', 'artworks.id', 'congratulations.artwork_id')
+      .leftJoin('comments', 'artworks.id', 'comments.artwork_id')
+      // artist info
+      .join('users', 'users.id', 'artworks.user_id')
+
+    if (artist_id) { // show art from an artist
+      query.where('artworks.user_id', artist_id)
+    }
+    if (category_id) { // filter by category
+      query.where('art_categories.id', category_id)
+    }
+    if (subcategory_id) { // filter by sub-category
+      query.where('art_subcategories.id', subcategory_id)
+    }
+    if (notIn && notIn.length > 0) { // Get more art
+      query.whereNotIn('artworks.id', notIn)
+    }
+
+    return await query.orderBy('artworks.updated_at', 'desc')
+    .groupBy('artworks.id').limit(10).fetch()
   }
 
   async store({ auth, request, response }) {
     const user = await auth.getUser();
     const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
-    
+
     const artwork = new Artwork()
     artwork.title = title
     artwork.description = description
@@ -46,11 +66,11 @@ class ArtWorkController {
     artwork.user_id = user.id
 
     artwork.is_private = is_private
-        
+
     await artwork.save()
     console.log(artwork);
     return response.json(artwork)
-    
+
   }
   async showInfoToEdit({auth}) {
     const user = await auth.getUser()
@@ -58,7 +78,7 @@ class ArtWorkController {
     const artworks = await findUser.artworks().last()
     return { artworks }
   }
-  
+
   async showInfoToEdit({auth}) {
     const user = await auth.getUser()
     const findUser = await User.find(user.id)
@@ -72,22 +92,22 @@ class ArtWorkController {
     console.log(artwork_id);
     const artwork = await Artwork.find(artwork_id)
     const { title, description, is_adult_content } = request.all()
-    
+
     const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
     const coverImg = request.file('path_img', validationOptions)
     const name = 'artwork' + Math.random() + '.' + coverImg.clientName
     await coverImg.move(Helpers.tmpPath('artwork'), { name: name})
-  
+
     const path = 'artwork/' + name
     const unicorn = await Drive.get(path)
     const imagen = Buffer.from(unicorn).toString('base64')
-    
+
     artwork.title = title
     artwork.description = description
     artwork.path_img = path
     artwork.is_adult_content = is_adult_content
     artwork.save()
-    
+
     //ADD CHAPTER TO ARTWORK
     const chapter_artwork = await artwork.chapters().first()
     const { title_chapter, content, name2 } = request.all()
@@ -99,7 +119,7 @@ class ArtWorkController {
 
     //ADD TAGS TO ARTWORK
     const tag = new Tags()
-    tag.name = name2 
+    tag.name = name2
     const data = await Tags.query().fetch()
     const x = data.rows
     for (let i = 0; i < x.length; i++) {
@@ -151,7 +171,7 @@ class ArtWorkController {
       .innerJoin('comments', 'comments.user_id', 'users.id')
       .where('artwork_id', artwork.id).fetch()
     artwork.commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
-    
+
     artwork.congratulations = await Artwork.query().select("artworks.*", "congratulations.*").from('congratulations')
       .innerJoin('artworks', 'artworks.id', 'congratulations.artwork_id')
       .innerJoin('users', 'congratulations.user_id', 'users.id').fetch()
@@ -167,16 +187,16 @@ class ArtWorkController {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
-    
+
     const comment = new Comment()
     comment.content = request.input('content')
     comment.user_id = user.id
     comment.artwork_id = artwork.id
     comment.save()
- 
+
     return response.json(comment)
   }
-  
+
   async stream({ }) {
 
   }

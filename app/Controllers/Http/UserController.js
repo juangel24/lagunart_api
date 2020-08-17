@@ -75,7 +75,9 @@ class UserController {
       .leftJoin('comments', 'artworks.id', 'comments.artwork_id')
       .whereIn('users.id', followingUsers)
 
-    if (artNotIn) { artworks.whereNotIn('artworks.id', artNotIn) }
+    if (artNotIn && artNotIn.isArray() && artNotIn.length > 0) {
+      artworks.whereNotIn('artworks.id', artNotIn)
+    }
 
     return await artworks.orderBy('artworks.updated_at', 'desc')
     .groupBy('artworks.id').fetch()
