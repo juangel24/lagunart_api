@@ -73,7 +73,6 @@ class ArtWorkController {
       const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
       const coverImg = path_img
 
-      //const coverImg = request.file('path_img', validationOptions)
       
       const name = 'artwork' + Math.random() + '.'
      
