@@ -3,7 +3,6 @@
 const Artwork = use('App/Models/Artwork');
 const Event = use('App/Models/Event');
 const User = use('App/Models/User')
-const User = use('App/Models/User');
 const ArtSubcategory = use('App/Models/ArtSubcategory');
 const ArtCategory = use('App/Models/ArtCategory');
 class SearchController {
@@ -20,8 +19,13 @@ class SearchController {
 	}
 
 	async user({params, id}){
+		console.log('entro');
+		// console.log(id);
+		console.log(params);
 		const palabra = params.params
 		const user = params.id
+
+		
 
 		const busqueda = "%" + palabra + "%"
 

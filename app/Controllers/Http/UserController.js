@@ -173,12 +173,15 @@ class UserController {
     console.log(tag);
 
     try {
-
       // const Artwork = await Artwork.query().select('*').where('artworks.id', 1).fetch()
-      const artworkOfUser = await Artwork.find(artwork_id)
-      console.log(artworkOfUser);
-      const ArtworksOfTag = await Db.select('artworks_has_tags.tag_id').from('artworks')
-        .join('')
+      // const artworkOfUser = await Artwork.find(artwork_id)
+      // console.log(artworkOfUser);
+      const ArtworksOfTag = await Db.select('artworks.*').from('artworks')
+        .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+        .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+        .where('tags.name', tag)
+        // .limit(10).fetch()
+      console.log(ArtworksOfTag);
       // const ArtworksOfTag = await Artwork.query().select('*').from('artworks_has_tags')
       //   .join('artworks_has_tags', 'artworks_has_tags.id', 'artworks.art_subcategory_id')
       //   .where('art_subcategories.subcategory')
