@@ -67,15 +67,14 @@ class ArtWorkController {
     try {
       const artwork_id = request.input('artwork_id')
       const artwork = await Artwork.find(artwork_id)
-      const { title, description, is_adult_content, path_img } = request.all()
-
-
+      const { title, description, is_adult_content, path_img, extension } = request.all()
+      console.log(title);
       const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
       const coverImg = path_img
 
       //const coverImg = request.file('path_img', validationOptions)
       
-      const name = 'artwork' + Math.random() + '.'
+      const name = 'artwork' + Math.random() + '.' + extension 
      
       await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
       const path = 'artwork/' + name
@@ -186,7 +185,9 @@ class ArtWorkController {
     return response.json({ message: 'Se eliminó la obra' })
   }
   async tags({ request, response }) {
-    const  name  = request.input('name')
+    const artwork_id = request.input('artwork_id')
+    const artwork = await Artwork.find(artwork_id)
+    const name = request.input('name')
     const tag = new Tags()
     const data = await Tags.query().fetch()
     for (let i = 0; tag.length; i++) {
@@ -196,7 +197,7 @@ class ArtWorkController {
         tag.name = name
       }
     }
-    console.log(data.rows);
+
     await artwork.tags().save(tag)
     await artwork.save()
     console.log(artwork);
