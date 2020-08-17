@@ -64,47 +64,55 @@ class ArtWorkController {
   }
 
   async update({ request }) {
-    const artwork_id = request.input('artwork_id')
-    const artwork = await Artwork.find(artwork_id)
-    const { title, description, is_adult_content } = request.all()
+    try {
+      const artwork_id = request.input('artwork_id')
+      const artwork = await Artwork.find(artwork_id)
+      const { title, description, is_adult_content, path_img } = request.all()
 
-    const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
-    const coverImg = request.file('path_img', validationOptions)
-    const name = 'artwork' + Math.random() + '.' + coverImg.clientName
-    await coverImg.move(Helpers.tmpPath('artwork'), { name: name})
 
-    const path = 'artwork/' + name
-    const unicorn = await Drive.get(path)
-    const imagen = Buffer.from(unicorn).toString('base64')
+      const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
+      const coverImg = path_img
 
-    artwork.title = title
-    artwork.description = description
-    artwork.path_img = path
-    artwork.is_adult_content = is_adult_content
-    artwork.save()
+      
+      const name = 'artwork' + Math.random() + '.'
+     
+      await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
+      const path = 'artwork/' + name
+      const unicorn = await Drive.get(path)
 
-    //ADD CHAPTER TO ARTWORK
-    const chapter_artwork = await artwork.chapters().first()
-    const { title_chapter, content, name2 } = request.all()
-    chapter_artwork.tittle = title_chapter
-    chapter_artwork.content = content
-    chapter_artwork.artwork_id = artwork
+      artwork.title = title
+      artwork.description = description
+      artwork.path_img = path
+      artwork.is_adult_content = is_adult_content
+      console.log(artwork);
+      artwork.save()
 
-    chapter_artwork.save()
+      //ADD CHAPTER TO ARTWORK
+      const chapter_artwork = await artwork.chapters().first()
+      const { title_chapter, content, name2 } = request.all()
+      chapter_artwork.tittle = title_chapter
+      chapter_artwork.content = content
+      chapter_artwork.artwork_id = artwork
 
-    //ADD TAGS TO ARTWORK
-    const tag = new Tags()
-    tag.name = name2
-    const data = await Tags.query().fetch()
-    const x = data.rows
-    for (let i = 0; i < x.length; i++) {
-      if (tag.name == x[i].name) {
-        console.log(x[i])
-        return "Ya existe esa etiqueta"
+      chapter_artwork.save()
+
+      //ADD TAGS TO ARTWORK
+      const tag = new Tags()
+      tag.name = name2
+      const data = await Tags.query().fetch()
+      const x = data.rows
+      for (let i = 0; i < x.length; i++) {
+        if (tag.name == x[i].name) {
+          console.log(x[i])
+          return "Ya existe esa etiqueta"
+        }
       }
+      await artwork.tags().save(tag)
+      return { artwork, chapter_artwork, tag }
+    
+    } catch (error) {
+      console.log(error)
     }
-    await artwork.tags().save(tag)
-    return {artwork, chapter_artwork, tag }
   }
 
   async chapter({ auth, request, response, params }) {
@@ -132,6 +140,7 @@ class ArtWorkController {
     return response.json(congratulate)
   }
   async show({ request }) {
+    const imagen = Buffer.from(unicorn).toString('base64')
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
     artwork.comments = await Comment.query().where('artwork_id', artwork.id).fetch()
@@ -175,7 +184,23 @@ class ArtWorkController {
     await artwork.delete()
     return response.json({ message: 'Se eliminó la obra' })
   }
-
+  async tags({ request, response }) {
+    const  name  = request.input('name')
+    const tag = new Tags()
+    const data = await Tags.query().fetch()
+    for (let i = 0; tag.length; i++) {
+      if (data) {
+        return "Ya existe esa etiqueta"
+      } else {
+        tag.name = name
+      }
+    }
+    console.log(data.rows);
+    await artwork.tags().save(tag)
+    await artwork.save()
+    console.log(artwork);
+    return response.json(artwork)
+  }
 }
 
 module.exports = ArtWorkController
