@@ -186,13 +186,7 @@ class ArtWorkController {
     return response.json({ message: 'Se eliminó la obra' })
   }
   async tags({ request, response }) {
-<<<<<<< HEAD
-    const { name } = request.all()
-=======
-    const artwork_id = request.input('artwork_id')
-    const artwork = await Artwork.find(artwork_id)
-    const name = request.input('name')
->>>>>>> iovas
+    const  name  = request.input('name')
     const tag = new Tags()
     const data = await Tags.query().fetch()
     for (let i = 0; tag.length; i++) {
@@ -202,16 +196,7 @@ class ArtWorkController {
         tag.name = name
       }
     }
-<<<<<<< HEAD
     console.log(data.rows);
-    //return data
-
-    tag.save()
-    console.log(tag);
-    return response.json(tag)
-=======
- 
->>>>>>> iovas
     await artwork.tags().save(tag)
     await artwork.save()
     console.log(artwork);
