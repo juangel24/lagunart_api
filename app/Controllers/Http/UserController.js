@@ -7,12 +7,8 @@ const Db = use('Database')
 class UserController {
   async artworks({ request }) {
     const { artist_id, category_id, subcategory_id, notIn } = request.all()
-    // console.log(request.all());
 
-    const query = Artwork.query().select('artworks.*', 'art_subcategories.subcategory', 'art_categories.category')
-      .join('art_subcategories', 'artworks.art_subcategory_id', 'art_subcategories.id')
-      .join('art_categories', 'art_subcategories.art_categories_id', 'art_categories.id')
-      .where('artworks.user_id', artist_id)
+    const query = Artwork.queryArt().where('artworks.user_id', artist_id)
 
     if (category_id) {
       query.andWhere('art_categories.id', category_id)
@@ -20,7 +16,7 @@ class UserController {
     if (subcategory_id) {
       query.andWhere('artworks.art_subcategory_id', subcategory_id)
     }
-    if (notIn) { query.whereNotIn('artworks.id', notIn) }
+    if (notIn && notIn.length > 0) { query.whereNotIn('artworks.id', notIn) }
 
     return await query.limit(20).orderBy('artworks.updated_at', 'desc').fetch()
   }
@@ -31,18 +27,24 @@ class UserController {
   }
 
   async follow({ request, response }) {
-    const data = request.only(['follower', 'user_id'])
-    const follower = await Follower.query().where('follower', data.follower)
-      .andWhere('user_id', data.user_id).first()
-    const followedUser = await User.find(data.user_id)
+    try {
+      const data = request.only(['follower', 'user_id'])
 
-    if (follower) {
-      await followedUser.followers().detach([data.follower])
-      return response.send('Dejaste de seguir a ' + followedUser.username)
+      const follower = await Follower.query().where('follower', data.follower)
+        .andWhere('user_id', data.user_id).first()
+
+      const followedUser = await User.find(data.user_id)
+
+      if (follower) {
+        await followedUser.followers().detach([data.follower])
+        return response.send('Dejaste de seguir a ' + followedUser.username)
+      }
+
+      await Follower.create(data)
+      return response.send('Sigues a ' + followedUser.username)
+    } catch (error) {
+      console.log(error);
     }
-
-    await Follower.create(data)
-    return response.send('Sigues a ' + followedUser.username)
   }
 
   async followers({ request }) {
@@ -60,27 +62,14 @@ class UserController {
     const user = await User.find(user_id)
     const followingUsers = await user.following().ids()
 
-    let artworks = Artwork.query().select(
-        'artworks.*',
-        'users.username',
-        'users.profile_img'
-      ).select(Db.raw(
-        'COUNT(congratulations.artwork_id) AS congratulations, '+
-        'COUNT(comments.id) AS comments'
-        ))
-      .join('art_subcategories', 'artworks.art_subcategory_id', 'art_subcategories.id')
-      .join('art_categories', 'art_subcategories.art_categories_id', 'art_categories.id')
-      .join('users', 'artworks.user_id', 'users.id')
-      .leftJoin('congratulations', 'artworks.id', 'congratulations.artwork_id')
-      .leftJoin('comments', 'artworks.id', 'comments.artwork_id')
+    let query = Artwork.queryArt().select('users.profile_img')
       .whereIn('users.id', followingUsers)
 
-    if (artNotIn && artNotIn.isArray() && artNotIn.length > 0) {
-      artworks.whereNotIn('artworks.id', artNotIn)
+    if (artNotIn && artNotIn.length > 0) {
+      query.whereNotIn('artworks.id', artNotIn)
     }
 
-    return await artworks.orderBy('artworks.updated_at', 'desc')
-    .groupBy('artworks.id').fetch()
+    return await query.orderBy('artworks.updated_at', 'desc').fetch()
   }
 
   async show({ params, request, response }) {
