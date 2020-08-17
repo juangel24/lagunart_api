@@ -92,7 +92,7 @@ class ArtWorkController {
       const { title_chapter, content, name2 } = request.all()
       chapter_artwork.tittle = title_chapter
       chapter_artwork.content = content
-      chapter_artwork.artwork_id = artwork
+      chapter_artwork.artwork_id = artwork.id
 
       chapter_artwork.save()
 
@@ -134,10 +134,19 @@ class ArtWorkController {
   async congratulate({ auth, response, request }) {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
-
     const artwork = await Artwork.find(artwork_id)
-    const congratulate = await user.congratulations().save(artwork)
-    return response.json(congratulate)
+
+    const check = await user.congratulations().where('artwork_id', artwork.id).first()
+
+    if (check) {
+      await await user.congratulations().detach(artwork.id)
+      return response.send('quitaste tus felicitaciones')
+    }
+   else {
+      await user.congratulations().save(artwork)
+      return response.send('felicidades')
+    }
+    //return response.json(congratulate)
   }
   async show({ request }) {
     const imagen = Buffer.from(unicorn).toString('base64')
