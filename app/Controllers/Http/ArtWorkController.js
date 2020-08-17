@@ -14,32 +14,10 @@ const { validate } = use('Validator')
 
 class ArtWorkController {
   async index({ request }) {
-    const { artist_id, category_id, subcategory_id, notIn } = request.all()
+    const { category_id, subcategory_id, notIn } = request.all()
 
-    const query = Artwork.query().select(
-      'artworks.*',
-      'art_categories.id AS category_id',
-      'art_categories.category AS category',
-      'art_subcategories.id AS subcategory_id',
-      'art_subcategories.subcategory AS subcategory',
-      'users.id AS user_id',
-      'users.username')
-      .select(Database.raw(
-        'COUNT(congratulations.artwork_id) AS congratulations, '+
-        'COUNT(comments.id) AS comments'
-      ))
-      // categories info
-      .join('art_subcategories', 'artworks.art_subcategory_id', 'art_subcategories.id')
-      .join('art_categories', 'art_subcategories.art_categories_id', 'art_categories.id')
-      //
-      .leftJoin('congratulations', 'artworks.id', 'congratulations.artwork_id')
-      .leftJoin('comments', 'artworks.id', 'comments.artwork_id')
-      // artist info
-      .join('users', 'users.id', 'artworks.user_id')
+    const query = Artwork.queryArt()
 
-    if (artist_id) { // show art from an artist
-      query.where('artworks.user_id', artist_id)
-    }
     if (category_id) { // filter by category
       query.where('art_categories.id', category_id)
     }
@@ -50,8 +28,7 @@ class ArtWorkController {
       query.whereNotIn('artworks.id', notIn)
     }
 
-    return await query.orderBy('artworks.updated_at', 'desc')
-    .groupBy('artworks.id').limit(10).fetch()
+    return await query.orderBy('artworks.updated_at', 'desc').limit(10).fetch()
   }
 
   async store({ auth, request, response }) {
