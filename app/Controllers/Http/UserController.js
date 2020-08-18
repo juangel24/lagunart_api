@@ -8,6 +8,7 @@ const Drive = use('Drive')
 class UserController {
   async artworks({ request }) {
     const { artist_id, category_id, subcategory_id, notIn } = request.all()
+    console.log(artist_id);
 
     const query = Artwork.queryArt().where('artworks.user_id', artist_id)
 
@@ -28,18 +29,26 @@ class UserController {
   }
 
   async follow({ request, response }) {
-    const data = request.only(['follower', 'user_id'])
-    const follower = await Follower.query().where('follower', data.follower)
-      .andWhere('user_id', data.user_id).first()
-    const followedUser = await User.find(data.user_id)
 
-    if (follower) {
-      await followedUser.followers().detach([data.follower])
-      return response.send('Dejaste de seguir a ' + followedUser.username)
-    }
+      const data = request.only(['follower', 'user_id'])
+      console.log(data);
+      const follower = await Follower.query().where('follower', data.follower)
+        .andWhere('user_id', data.user_id).first()
 
-    await Follower.create(data)
-    return response.send('Sigues a ' + followedUser.username)
+      console.log(follower);
+
+      const followedUser = await User.find(data.user_id)
+
+      if (follower) {
+        await followedUser.followers().detach([data.follower])
+        console.log(followedUser.username);
+        return response.send(0)
+      }
+
+      await Follower.create(data)
+      console.log(followedUser.username);
+      return response.send(1)
+
   }
 
   async followers({ request }) {
@@ -65,8 +74,16 @@ class UserController {
     }
 
     let artworks = await query.orderBy('artworks.updated_at', 'desc').fetch()
+    artworks = await this._withImages(artworks.rows)
 
-    return this._withImages(artworks.rows)
+    for (let i = 0; i < artworks.length; i++) {
+      const artwork = await Artwork.find(artworks[i].id)
+      if (await artwork.congratulations().where('id', user_id).first()) {
+        artworks[i].congratulated = true
+      } else { artworks[i].congratulated = false }
+    }
+
+    return artworks
   }
 
   async show({ params, request, response }) {
@@ -169,6 +186,54 @@ class UserController {
     }
 
     return artworks
+  }
+
+  async getRelatesImagesByTag({ request }) {
+    // try {
+    //   const artwork_id = request.input('artwork_id')
+    //   console.log('getRelatesImagesByTag', artwork_id);
+    //   const tagsOfArtwork = await Db.select('tags.*').from('artworks')
+    //     .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+    //     .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+    //     .where('artworks_has_tags.artwork_id', artwork_id)
+    //   console.log(tagsOfArtwork);
+
+    //   const artworksOfTags = await Db.select('artworks.*').from('artworks')
+    //     .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+    //     .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+    //     .whereRaw('tags.name = ?', tagsOfArtwork[0].name)
+    //     .orderBy('artworks.views', 'desc')
+    //     .limit(20)
+
+    //   console.log(artworksOfTags);
+    //   return { artworksOfTags }
+    // } catch (error) {
+    //   console.log('error: ', error);
+    // }
+  }
+
+  async getAllTagsOfArtwork({request}) {
+    try {
+      const artwork_id = request.input('artwork_id')
+      const tagsOfArtwork = await Db.select('tags.name').from('artworks')
+        .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+        .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+        .where('artworks_has_tags.artwork_id', artwork_id)
+
+      if (tagsOfArtwork) {
+        const artworksOfTags = await Db.select('artworks.*').from('artworks')
+          .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+          .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+          .whereRaw('tags.name = ?', tagsOfArtwork[0].name)
+          .orderBy('artworks.views', 'desc')
+          .limit(20)
+
+        return { tagsOfArtwork, artworksOfTags }
+      }
+      return { tagsOfArtwork }
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 

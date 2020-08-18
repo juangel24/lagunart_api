@@ -38,7 +38,8 @@ Route.post('comment/artwork', 'ArtWorkController.comment')
 
 //LIKES
 Route.post('artwork/like', 'ArtWorkController.congratulate')
-//Route.post('/pruebon', 'ArtWorkController.tags')
+// Route.post('/pruebon', 'ArtWorkController.tags')
+Route.post('/tags', 'ArtWorkController.tags')
 
 
 Route.get('search/home/:params', 'SearchController.home')
@@ -63,3 +64,5 @@ Route.post('user/favorites/toggle', 'UserController.toggleFavorite')
 Route.post('user/follow', 'UserController.follow')
 Route.post('user/followers', 'UserController.followers')
 Route.post('user/following', 'UserController.following')
+// Route.post('user/artworks/tag', 'UserController.getRelatesImagesByTag')
+Route.post('user/artworks/tags', 'UserController.getAllTagsOfArtwork')

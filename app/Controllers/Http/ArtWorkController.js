@@ -28,7 +28,18 @@ class ArtWorkController {
       query.whereNotIn('artworks.id', notIn)
     }
 
-    return await query.orderBy('artworks.updated_at', 'desc').limit(10).fetch()
+    var artworks = await query.orderBy('artworks.updated_at', 'desc').limit(10).fetch()
+    artworks = artworks.rows
+    for (let index = 0; index < artworks.length; index++) {
+      const art = artworks[index];
+      let imgPath = art.path_img
+      let file = await Drive.get(imgPath)
+      let base64 = Buffer.from(file).toString('base64')
+
+      artworks[index].path_img = base64
+    }
+
+    return artworks
   }
 
   async store({ auth, request, response }) {
@@ -53,7 +64,9 @@ class ArtWorkController {
     const user = await auth.getUser()
     const findUser = await User.find(user.id)
     const artworks = await findUser.artworks().last()
-
+    //const subcat = Database.select('artworks.*').from('art_subcategory_id').innerJoin('art_categories', 'art_categories.id', 'art_subcategories.art_categories_id')
+      //.innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
+      //.where('artworks.art_subcategory_id', artworks.id)
       return { artworks }
   }
 
@@ -76,7 +89,7 @@ class ArtWorkController {
       artwork.title = title
       artwork.description = description
       artwork.path_img = path
-      artwork.is_adult_content = is_adult_content
+      artwork.extension = respuesta.extension
       artwork.save()
 
       //ADD CHAPTER TO ARTWORK
@@ -87,8 +100,8 @@ class ArtWorkController {
         chapter_artwork.tittle = title_chapter
         chapter_artwork.content = content
         chapter_artwork.artwork_id = artwork_id
+        chapter_artwork.save()
       }
-      chapter_artwork.save()
   
       //ADD TAGS TO ARTWORK
       const tags = request.body.tags
@@ -117,6 +130,11 @@ class ArtWorkController {
 
     const check = await user.congratulations().where('artwork_id', artwork.id).first()
 
+    console.log(user);
+    // console.log(artwork_id);
+    console.log(artwork);
+    console.log(check);
+
     if (check) {
       await await user.congratulations().detach(artwork.id)
       return response.send('quitaste tus felicitaciones')
@@ -127,9 +145,19 @@ class ArtWorkController {
     }
   }
   async show({ request }) {
+    // const artwork_id = request._raw
+    // console.log(request._raw);
+    // console.log(request.all());
     const artwork_id = request.input('artwork_id')
+    console.log('show ', artwork_id);
     const artwork = await Artwork.find(artwork_id)
-    artwork.comments = await Comment.query().where('artwork_id', artwork.id).fetch()
+    artwork.user = await Artwork.query().select('users.username', 'users.profile_img', 'users.cover_img', 'users.name').from ('users')
+      .innerJoin('artworks', 'artworks.user_id', 'users.id')
+      .where('artworks.id', artwork_id).fetch()
+
+    artwork.comments = await Comment.query().select('comments.*', 'users.username', 'users.profile_img', 'users.cover_img').from('users')
+      .innerJoin('comments', 'comments.user_id', 'users.id')
+      .where('artwork_id', artwork.id).fetch()
     artwork.commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
 
     artwork.congratulations = await Artwork.query().select("artworks.*", "congratulations.*").from('congratulations')
@@ -138,7 +166,7 @@ class ArtWorkController {
     artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id',artwork.id).getCount()
 
     artwork.chapter = await artwork.chapters().where('artwork_id', artwork.id).fetch()
-
+    // console.log(artwork);
     return { artwork }
   }
 

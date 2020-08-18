@@ -2,7 +2,7 @@
 
 const Artwork = use('App/Models/Artwork');
 const Event = use('App/Models/Event');
-const User = use('App/Models/User');
+const User = use('App/Models/User')
 const ArtSubcategory = use('App/Models/ArtSubcategory');
 const ArtCategory = use('App/Models/ArtCategory');
 class SearchController {

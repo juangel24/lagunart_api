@@ -12,6 +12,10 @@ class CategoryController {
 		return { subcat }
 	}
 	async getSubcategories({params}) {
+		if (params.id == 0 || params.id == 'undefined') {
+			const subcat = await Subcategory.query().fetch()
+			return subcat
+		}
 		const catego = await Category.findBy('id', params.id)
 		const subcat = await catego.subcategory().fetch()
 		return subcat
