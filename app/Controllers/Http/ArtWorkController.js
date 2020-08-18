@@ -68,11 +68,7 @@ class ArtWorkController {
       const coverImg = respuesta.path_img
 
 
-<<<<<<< HEAD
       const name = 'artwork' + Math.random() + '.' + respuesta.extension
-=======
-      const name = 'artwork' + Math.random() + '.' + respuesta.extension 
->>>>>>> eab885b5b59c511acec657bf7a83ccde2058d87b
 
       await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
       const path = 'artwork/' + name
