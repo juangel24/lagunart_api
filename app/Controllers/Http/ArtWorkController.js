@@ -33,7 +33,7 @@ class ArtWorkController {
 
   async store({ auth, request, response }) {
     const user = await auth.getUser();
-    const { title, description, categories, art_subcategory_id, is_adult_content, is_private } = request.all()
+    const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
     const artwork = new Artwork()
     artwork.title = title
     artwork.description = description
