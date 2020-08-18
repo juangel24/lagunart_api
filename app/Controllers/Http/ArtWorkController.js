@@ -65,51 +65,53 @@ class ArtWorkController {
 
   async update({ request }) {
     try {
-      const artwork_id = request.input('artwork_id')
+      const respuesta = request.body.form
+      const artwork_id = respuesta.artwork_id
       const artwork = await Artwork.find(artwork_id)
-      const { title, description, is_adult_content, path_img } = request.all()
+
+      const { title, description, is_adult_content, art_subcategory_id } = request.all()
+      const coverImg = respuesta.path_img
 
 
-      const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
-      const coverImg = path_img
+      const name = 'artwork' + Math.random() + '.' + respuesta.extension
 
-      
-      const name = 'artwork' + Math.random() + '.'
-     
       await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
       const path = 'artwork/' + name
       const unicorn = await Drive.get(path)
+
 
       artwork.title = title
       artwork.description = description
       artwork.path_img = path
       artwork.is_adult_content = is_adult_content
-      console.log(artwork);
       artwork.save()
 
       //ADD CHAPTER TO ARTWORK
-      const chapter_artwork = await artwork.chapters().first()
-      const { title_chapter, content, name2 } = request.all()
-      chapter_artwork.tittle = title_chapter
-      chapter_artwork.content = content
-      chapter_artwork.artwork_id = artwork.id
 
-      chapter_artwork.save()
+      const { title_chapter, content, name2 } = request.all()
+      const chapter_artwork = await artwork.chapters().first()
+      if (art_subcategory_id == 7 || art_subcategory_id == 8 || art_subcategory_id == 9 || art_subcategory_id == 10 || art_subcategory_id == 11) {
+        chapter_artwork.tittle = title_chapter
+        chapter_artwork.content = content
+        chapter_artwork.artwork_id = artwork.id
+        chapter_artwork.save()
+      }
 
       //ADD TAGS TO ARTWORK
-      const tag = new Tags()
-      tag.name = name2
-      const data = await Tags.query().fetch()
-      const x = data.rows
-      for (let i = 0; i < x.length; i++) {
-        if (tag.name == x[i].name) {
-          console.log(x[i])
-          return "Ya existe esa etiqueta"
+      const tags = request.body.tags
+      var tag_id = {}
+      for (let index = 0; index < tags.length; index++) {
+        const data = await Tags.findBy('name', tags[index])
+        if (!data) {
+          const tag = new Tags()
+          tag.name = tags[index]
+          tag.save()
         }
+        tag_id = await Tags.findBy('name', tags[index])
+        await artwork.tags().save(tag_id)
       }
-      await artwork.tags().save(tag)
-      return { artwork, chapter_artwork, tag }
-    
+      return { artwork, chapter_artwork, tags }
+
     } catch (error) {
       console.log(error)
     }
