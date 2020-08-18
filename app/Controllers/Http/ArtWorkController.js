@@ -82,13 +82,13 @@ class ArtWorkController {
       //ADD CHAPTER TO ARTWORK
 
       const { title_chapter, content, name2 } = request.all()
-      const chapter_artwork = await artwork.chapters().first()
+      const chapter_artwork = new Chapter()
       if (art_subcategory_id == 7 || art_subcategory_id == 8 || art_subcategory_id == 9 || art_subcategory_id == 10 || art_subcategory_id == 11) {
         chapter_artwork.tittle = title_chapter
         chapter_artwork.content = content
-        chapter_artwork.artwork_id = artwork.id
-        chapter_artwork.save()
+        chapter_artwork.artwork_id = artwork_id
       }
+      chapter_artwork.save()
   
       //ADD TAGS TO ARTWORK
       const tags = request.body.tags
