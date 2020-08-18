@@ -66,49 +66,51 @@ class ArtWorkController {
   async update({ request }) {
     try {
       const artwork_id = request.input('artwork_id')
-    console.log(artwork_id);
-    const artwork = await Artwork.find(artwork_id)
-    const { title, description, is_adult_content } = request.all()
+      const artwork = await Artwork.find(artwork_id)
+      const { title, description, is_adult_content, path_img, extension } = request.all()
+      console.log(title);
+      const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
+      const coverImg = path_img
 
-    const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
-    const coverImg = request.file('path_img', validationOptions)
-    const name = 'artwork' + Math.random() + '.' + coverImg.clientName
-    await coverImg.move(Helpers.tmpPath('artwork'), { name: name})
+      
+      const name = 'artwork' + Math.random() + '.' + extension 
+     
+      await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
+      const path = 'artwork/' + name
+      const unicorn = await Drive.get(path)
 
-    const path = 'artwork/' + name
-    const unicorn = await Drive.get(path)
-    const imagen = Buffer.from(unicorn).toString('base64')
+      artwork.title = title
+      artwork.description = description
+      artwork.path_img = path
+      artwork.is_adult_content = is_adult_content
+      console.log(artwork);
+      artwork.save()
 
-    artwork.title = title
-    artwork.description = description
-    artwork.path_img = path
-    artwork.is_adult_content = is_adult_content
-    artwork.save()
+      //ADD CHAPTER TO ARTWORK
+      const chapter_artwork = await artwork.chapters().first()
+      const { title_chapter, content, name2 } = request.all()
+      chapter_artwork.tittle = title_chapter
+      chapter_artwork.content = content
+      chapter_artwork.artwork_id = artwork.id
 
-    //ADD CHAPTER TO ARTWORK
-    const chapter_artwork = await artwork.chapters().first()
-    const { title_chapter, content, name2 } = request.all()
-    chapter_artwork.tittle = title_chapter
-    chapter_artwork.content = content
-    chapter_artwork.artwork_id = artwork
+      chapter_artwork.save()
 
-    chapter_artwork.save()
-
-    //ADD TAGS TO ARTWORK
-    const tag = new Tags()
-    tag.name = name2
-    const data = await Tags.query().fetch()
-    const x = data.rows
-    for (let i = 0; i < x.length; i++) {
-      if (tag.name == x[i].name) {
-        console.log(x[i])
-        return "Ya existe esa etiqueta"
+      //ADD TAGS TO ARTWORK
+      const tag = new Tags()
+      tag.name = name2
+      const data = await Tags.query().fetch()
+      const x = data.rows
+      for (let i = 0; i < x.length; i++) {
+        if (tag.name == x[i].name) {
+          console.log(x[i])
+          return "Ya existe esa etiqueta"
+        }
       }
-    }
-    await artwork.tags().save(tag)
-    return {artwork, chapter_artwork, tag }
+      await artwork.tags().save(tag)
+      return { artwork, chapter_artwork, tag }
+    
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   }
 
@@ -131,16 +133,32 @@ class ArtWorkController {
   async congratulate({ auth, response, request }) {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
-
     const artwork = await Artwork.find(artwork_id)
-    const congratulate = await user.congratulations().save(artwork)
-    return response.json(congratulate)
+
+    const check = await user.congratulations().where('artwork_id', artwork.id).first()
+
+    console.log(user);
+    // console.log(artwork_id);
+    console.log(artwork);
+    console.log(check);
+
+    if (check) {
+      await await user.congratulations().detach(artwork.id)
+      return response.send('quitaste tus felicitaciones')
+    }
+   else {
+      await user.congratulations().save(artwork)
+      return response.send('felicidades')
+    }
+    //return response.json(congratulate)
   }
   async show({ request }) {
     const artwork_id = request._raw
     // console.log(request._raw)
+    // const imagen = Buffer.from(unicorn).toString('base64')
+    // const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
-    artwork.user = await Artwork.query().select('users.username', 'users.profile_img').from ('users')
+    artwork.user = await Artwork.query().select('users.username', 'users.profile_img', 'users.cover_img', 'users.name').from ('users')
       .innerJoin('artworks', 'artworks.user_id', 'users.id')
       .where('artworks.id', request._raw).fetch()
 
@@ -186,6 +204,26 @@ class ArtWorkController {
     await artwork.comments().delete()
     await artwork.delete()
     return response.json({ message: 'Se eliminó la obra' })
+  }
+  async tags({ request, response }) {
+    const artwork_id = request.input('artwork_id')
+    const artwork = await Artwork.find(artwork_id)
+    const name = request.input('name')
+    console.log(artwork_id, name);
+    const tag = new Tags()
+    const data = await Tags.query().fetch()
+    for (let i = 0; tag.length; i++) {
+      if (data) {
+        return "Ya existe esa etiqueta"
+      } else {
+        tag.name = name
+      }
+    }
+
+    await artwork.tags().save(tag)
+    await artwork.save()
+    console.log(artwork);
+    return response.json(artwork)
   }
 }
 

@@ -27,24 +27,26 @@ class UserController {
   }
 
   async follow({ request, response }) {
-    try {
-      const data = request.only(['follower', 'user_id'])
 
+      const data = request.only(['follower', 'user_id'])
+      console.log(data);
       const follower = await Follower.query().where('follower', data.follower)
         .andWhere('user_id', data.user_id).first()
+
+      console.log(follower);
 
       const followedUser = await User.find(data.user_id)
 
       if (follower) {
         await followedUser.followers().detach([data.follower])
-        return response.send('Dejaste de seguir a ' + followedUser.username)
+        console.log(followedUser.username);
+        return response.send(0)
       }
 
       await Follower.create(data)
-      return response.send('Sigues a ' + followedUser.username)
-    } catch (error) {
-      console.log(error);
-    }
+      console.log(followedUser.username);
+      return response.send(1)
+
   }
 
   async followers({ request }) {
@@ -160,27 +162,41 @@ class UserController {
   //async userInfo() { }
 
   async getRelatesImagesByTag({ request }) {
-    const { tag, artwork_id } = request.all()
-    console.log(tag);
-
     try {
-      // const Artwork = await Artwork.query().select('*').where('artworks.id', 1).fetch()
-      // const artworkOfUser = await Artwork.find(artwork_id)
-      // console.log(artworkOfUser);
-      const ArtworksOfTag = await Db.select('artworks.*').from('artworks')
+      const artwork_id = request.input('artwork_id')
+      console.log('getRelatesImagesByTag', artwork_id);
+      const tagsOfArtwork = await Db.select('tags.*').from('artworks')
         .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
         .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-        .where('tags.name', tag)
-        // .limit(10).fetch()
-      console.log(ArtworksOfTag);
-      // const ArtworksOfTag = await Artwork.query().select('*').from('artworks_has_tags')
-      //   .join('artworks_has_tags', 'artworks_has_tags.id', 'artworks.art_subcategory_id')
-      //   .where('art_subcategories.subcategory')
-      //   .limit(10).fetch()
-      // // console.log(ArtworksOfTag)
-      // ArtworksOfTag.rows.forEach(element => {
-      //   console.log(element);
-      // });
+        .where('artworks_has_tags.artwork_id', artwork_id)
+      console.log(tagsOfArtwork);
+
+      let num = 0
+      const artworksOfTags = await Db.select('artworks.*').from('artworks')
+        .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+        .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+        .whereRaw('tags.name = ?', tagsOfArtwork[0].name)
+        .orderBy('artworks.views', 'desc')
+        .limit(20)
+
+      console.log(artworksOfTags);
+      return { artworksOfTags }
+    } catch (error) {
+      console.log('error: ', error);
+    }
+  }
+
+  async getAllTagsOfArtwork({request}) {
+    // console.log();
+    try {
+      const artwork_id = request.input('artwork_id')
+      console.log('getAllTagsOfArtwork', artwork_id);
+      const tagsOfArtwork = await Db.select('tags.name').from('artworks')
+        .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+        .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+        .where('artworks_has_tags.artwork_id', artwork_id)
+
+      return { tagsOfArtwork }
     } catch (error) {
       console.log(error);
     }
