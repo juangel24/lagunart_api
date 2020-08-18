@@ -3,6 +3,7 @@ const Artwork = use('App/Models/Artwork')
 const Follower = use('App/Models/Follower')
 const User = use('App/Models/User')
 const Db = use('Database')
+const Drive = use('Drive')
 
 class UserController {
   async artworks({ request }) {
@@ -63,7 +64,9 @@ class UserController {
       query.whereNotIn('artworks.id', artNotIn)
     }
 
-    return await query.orderBy('artworks.updated_at', 'desc').fetch()
+    let artworks = await query.orderBy('artworks.updated_at', 'desc').fetch()
+
+    return this._withImages(artworks.rows)
   }
 
   async show({ params, request, response }) {
@@ -150,8 +153,18 @@ class UserController {
     return users
   }
 
-  // No recuerdo para que iba a ser esta madre
-  //async userInfo() { }
+  async _withImages(artworks) {
+    for (let index = 0; index < artworks.length; index++) {
+      const art = artworks[index];
+      let imgPath = art.path_img
+      let file = await Drive.get(imgPath)
+      let base64 = Buffer.from(file, 'base64').toString('base64')
+
+      artworks[index].path_img = base64
+    }
+
+    return artworks
+  }
 }
 
 module.exports = UserController
