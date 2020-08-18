@@ -117,22 +117,6 @@ class ArtWorkController {
     }
   }
 
-  async chapter({ auth, request, response, params }) {
-    const artwork = await Artwork.find(params.id)
-
-    const chapter = new Chapter()
-    const { title, content } = request.all()
-    chapter.tittle = title
-    chapter.content = content
-    chapter.artwork_id = artwork.id
-    const chapter_artwork = await artwork.chapters().getCount()
-
-    const number = chapter_artwork
-    chapter.order = number + 1
-    chapter.save()
-    return response.json(chapter)
-  }
-
   async congratulate({ auth, response, request }) {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
@@ -196,7 +180,9 @@ class ArtWorkController {
     return response.json({ message: 'Se eliminó la obra' })
   }
   async tags({ request, response }) {
-    const  name  = request.input('name')
+    const artwork_id = request.input('artwork_id')
+    const artwork = await Artwork.find(artwork_id)
+    const name = request.input('name')
     const tag = new Tags()
     const data = await Tags.query().fetch()
     for (let i = 0; tag.length; i++) {
@@ -206,7 +192,7 @@ class ArtWorkController {
         tag.name = name
       }
     }
-    console.log(data.rows);
+
     await artwork.tags().save(tag)
     await artwork.save()
     console.log(artwork);
