@@ -44,7 +44,6 @@ class ArtWorkController {
     artwork.is_private = is_private
 
     await artwork.save()
-    console.log(artwork);
     return response.json(artwork)
 
   }
@@ -63,8 +62,7 @@ class ArtWorkController {
       const respuesta = request.body.form
       const artwork_id = respuesta.artwork_id
       const artwork = await Artwork.find(artwork_id)
-
-      const { title, description, is_adult_content, art_subcategory_id } = request.all()
+      const { title, description, art_subcategory_id } = request.all()
       const coverImg = respuesta.path_img
 
 
