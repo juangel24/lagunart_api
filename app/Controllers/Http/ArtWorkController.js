@@ -33,8 +33,7 @@ class ArtWorkController {
 
   async store({ auth, request, response }) {
     const user = await auth.getUser();
-    const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
-
+    const { title, description, categories, art_subcategory_id, is_adult_content, is_private } = request.all()
     const artwork = new Artwork()
     artwork.title = title
     artwork.description = description
@@ -49,65 +48,59 @@ class ArtWorkController {
     return response.json(artwork)
 
   }
-  async showInfoToEdit({auth}) {
-    const user = await auth.getUser()
-    const findUser = await User.find(user.id)
-    const artworks = await findUser.artworks().last()
-    return { artworks }
-  }
+
 
   async showInfoToEdit({auth}) {
     const user = await auth.getUser()
     const findUser = await User.find(user.id)
     const artworks = await findUser.artworks().last()
-    return { artworks }
+
+      return { artworks }
   }
 
   async update({ request }) {
     try {
-      const artwork_id = request.input('artwork_id')
+      const respuesta = request.body.form
+      const artwork_id = respuesta.artwork_id
       const artwork = await Artwork.find(artwork_id)
-      const { title, description, is_adult_content, path_img, extension } = request.all()
-      console.log(title);
-      const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
-      const coverImg = path_img
 
-      
-      const name = 'artwork' + Math.random() + '.' + extension 
-     
+      const { title, description, is_adult_content, art_subcategory_id } = request.all()
+      const coverImg = respuesta.path_img
+
+
+      const name = 'artwork' + Math.random() + '.' + respuesta.extension 
+
       await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
       const path = 'artwork/' + name
       const unicorn = await Drive.get(path)
 
-      artwork.title = title
-      artwork.description = description
-      artwork.path_img = path
-      artwork.is_adult_content = is_adult_content
-      console.log(artwork);
-      artwork.save()
+
 
       //ADD CHAPTER TO ARTWORK
-      const chapter_artwork = await artwork.chapters().first()
+    
       const { title_chapter, content, name2 } = request.all()
-      chapter_artwork.tittle = title_chapter
-      chapter_artwork.content = content
-      chapter_artwork.artwork_id = artwork.id
-
-      chapter_artwork.save()
+      const chapter_artwork = await artwork.chapters().first()
+      if (art_subcategory_id == 7 || art_subcategory_id == 8 || art_subcategory_id == 9 || art_subcategory_id == 10 || art_subcategory_id == 11) {      
+        chapter_artwork.tittle = title_chapter
+        chapter_artwork.content = content
+        chapter_artwork.artwork_id = artwork.id
+        chapter_artwork.save()
+      }     
 
       //ADD TAGS TO ARTWORK
-      const tag = new Tags()
-      tag.name = name2
-      const data = await Tags.query().fetch()
-      const x = data.rows
-      for (let i = 0; i < x.length; i++) {
-        if (tag.name == x[i].name) {
-          console.log(x[i])
-          return "Ya existe esa etiqueta"
+      const tags = request.body.tags
+      var tag_id = {}
+        for(let index = 0; index < tags.length; index++) {
+          const data = await Tags.findBy('name', tags[index])
+          if (!data) {
+            const tag = new Tags()
+            tag.name = tags[index]
+            tag.save()
+          }
+          tag_id = await Tags.findBy('name', tags[index])
+          await artwork.tags().save(tag_id)
         }
-      }
-      await artwork.tags().save(tag)
-      return { artwork, chapter_artwork, tag }
+      return { artwork, chapter_artwork, tags }
     
     } catch (error) {
       console.log(error)
@@ -145,10 +138,8 @@ class ArtWorkController {
       await user.congratulations().save(artwork)
       return response.send('felicidades')
     }
-    //return response.json(congratulate)
   }
   async show({ request }) {
-    const imagen = Buffer.from(unicorn).toString('base64')
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
     artwork.comments = await Comment.query().where('artwork_id', artwork.id).fetch()
@@ -195,19 +186,22 @@ class ArtWorkController {
   async tags({ request, response }) {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
+   
     const name = request.input('name')
     const tag = new Tags()
+    tag.name = name
     const data = await Tags.query().fetch()
-    for (let i = 0; tag.length; i++) {
-      if (data) {
+    const x = data.rows
+    for (let i = 0; i < x.length; i++) {
+      if (tag.name == x[i].name) {
+        console.log(x[i])
+        await artwork.tags().save(tag)
         return "Ya existe esa etiqueta"
       } else {
         tag.name = name
       }
     }
-
     await artwork.tags().save(tag)
-    await artwork.save()
     console.log(artwork);
     return response.json(artwork)
   }
