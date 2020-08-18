@@ -3,10 +3,12 @@ const Artwork = use('App/Models/Artwork')
 const Follower = use('App/Models/Follower')
 const User = use('App/Models/User')
 const Db = use('Database')
+const Drive = use('Drive')
 
 class UserController {
   async artworks({ request }) {
     const { artist_id, category_id, subcategory_id, notIn } = request.all()
+    console.log(artist_id);
 
     const query = Artwork.queryArt().where('artworks.user_id', artist_id)
 
@@ -71,7 +73,9 @@ class UserController {
       query.whereNotIn('artworks.id', artNotIn)
     }
 
-    return await query.orderBy('artworks.updated_at', 'desc').fetch()
+    let artworks = await query.orderBy('artworks.updated_at', 'desc').fetch()
+
+    return this._withImages(artworks.rows)
   }
 
   async show({ params, request, response }) {
@@ -158,42 +162,61 @@ class UserController {
     return users
   }
 
-  // No recuerdo para que iba a ser esta madre
-  //async userInfo() { }
+  async _withImages(artworks) {
+    for (let index = 0; index < artworks.length; index++) {
+      const art = artworks[index];
+      let imgPath = art.path_img
+      let file = await Drive.get(imgPath)
+      let base64 = Buffer.from(file, 'base64').toString('base64')
+
+      artworks[index].path_img = base64
+    }
+
+    return artworks
+  }
 
   async getRelatesImagesByTag({ request }) {
-    try {
-      const artwork_id = request.input('artwork_id')
-      console.log('getRelatesImagesByTag', artwork_id);
-      const tagsOfArtwork = await Db.select('tags.*').from('artworks')
-        .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-        .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-        .where('artworks_has_tags.artwork_id', artwork_id)
-      console.log(tagsOfArtwork);
+    // try {
+    //   const artwork_id = request.input('artwork_id')
+    //   console.log('getRelatesImagesByTag', artwork_id);
+    //   const tagsOfArtwork = await Db.select('tags.*').from('artworks')
+    //     .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+    //     .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+    //     .where('artworks_has_tags.artwork_id', artwork_id)
+    //   console.log(tagsOfArtwork);
 
-      const artworksOfTags = await Db.select('artworks.*').from('artworks')
-        .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-        .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-        .whereRaw('tags.name = ?', tagsOfArtwork[0].name)
-        .orderBy('artworks.views', 'desc')
-        .limit(20)
+    //   const artworksOfTags = await Db.select('artworks.*').from('artworks')
+    //     .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+    //     .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+    //     .whereRaw('tags.name = ?', tagsOfArtwork[0].name)
+    //     .orderBy('artworks.views', 'desc')
+    //     .limit(20)
 
-      console.log(artworksOfTags);
-      return { artworksOfTags }
-    } catch (error) {
-      console.log('error: ', error);
-    }
+    //   console.log(artworksOfTags);
+    //   return { artworksOfTags }
+    // } catch (error) {
+    //   console.log('error: ', error);
+    // }
   }
 
   async getAllTagsOfArtwork({request}) {
     try {
       const artwork_id = request.input('artwork_id')
-      console.log('getAllTagsOfArtwork', artwork_id);
       const tagsOfArtwork = await Db.select('tags.name').from('artworks')
         .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
         .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
         .where('artworks_has_tags.artwork_id', artwork_id)
 
+      if (tagsOfArtwork) {
+        const artworksOfTags = await Db.select('artworks.*').from('artworks')
+          .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+          .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+          .whereRaw('tags.name = ?', tagsOfArtwork[0].name)
+          .orderBy('artworks.views', 'desc')
+          .limit(20)
+
+        return { tagsOfArtwork, artworksOfTags }
+      }
       return { tagsOfArtwork }
     } catch (error) {
       console.log(error);

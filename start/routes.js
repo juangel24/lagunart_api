@@ -54,7 +54,8 @@ Route.post('notifications/modify', 'NotificationController.update')
 
 //TAGS
 Route.get('tags/:params', 'TagController.index')
-Route.post('tags/create/','ArtworkController.tags')
+Route.post('tags/create/', 'ArtworkController.tags')
+//Route.get('tags')
 // PAGE
 Route.post(':username', 'UserController.show')
 Route.post('user/artworks', 'UserController.artworks')
@@ -63,5 +64,5 @@ Route.post('user/favorites/toggle', 'UserController.toggleFavorite')
 Route.post('user/follow', 'UserController.follow')
 Route.post('user/followers', 'UserController.followers')
 Route.post('user/following', 'UserController.following')
-Route.post('user/artworks/tag', 'UserController.getRelatesImagesByTag')
+// Route.post('user/artworks/tag', 'UserController.getRelatesImagesByTag')
 Route.post('user/artworks/tags', 'UserController.getAllTagsOfArtwork')
