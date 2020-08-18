@@ -33,7 +33,7 @@ class ArtWorkController {
 
   async store({ auth, request, response }) {
     const user = await auth.getUser();
-    const { title, description, categories, art_subcategory_id, is_adult_content, is_private } = request.all()
+    const { title, description, art_subcategory_id, is_adult_content, is_private } = request.all()
     const artwork = new Artwork()
     artwork.title = title
     artwork.description = description
@@ -53,7 +53,9 @@ class ArtWorkController {
     const user = await auth.getUser()
     const findUser = await User.find(user.id)
     const artworks = await findUser.artworks().last()
-
+    //const subcat = Database.select('artworks.*').from('art_subcategory_id').innerJoin('art_categories', 'art_categories.id', 'art_subcategories.art_categories_id')
+      //.innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
+      //.where('artworks.art_subcategory_id', artworks.id)
       return { artworks }
   }
 
@@ -76,7 +78,6 @@ class ArtWorkController {
       artwork.title = title
       artwork.description = description
       artwork.path_img = path
-      artwork.is_adult_content = is_adult_content
       artwork.save()
 
       //ADD CHAPTER TO ARTWORK
@@ -87,8 +88,8 @@ class ArtWorkController {
         chapter_artwork.tittle = title_chapter
         chapter_artwork.content = content
         chapter_artwork.artwork_id = artwork_id
+        chapter_artwork.save()
       }
-      chapter_artwork.save()
   
       //ADD TAGS TO ARTWORK
       const tags = request.body.tags
