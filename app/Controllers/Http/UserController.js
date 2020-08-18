@@ -187,54 +187,6 @@ class UserController {
 
     return artworks
   }
-
-  async getRelatesImagesByTag({ request }) {
-    // try {
-    //   const artwork_id = request.input('artwork_id')
-    //   console.log('getRelatesImagesByTag', artwork_id);
-    //   const tagsOfArtwork = await Db.select('tags.*').from('artworks')
-    //     .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-    //     .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-    //     .where('artworks_has_tags.artwork_id', artwork_id)
-    //   console.log(tagsOfArtwork);
-
-    //   const artworksOfTags = await Db.select('artworks.*').from('artworks')
-    //     .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-    //     .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-    //     .whereRaw('tags.name = ?', tagsOfArtwork[0].name)
-    //     .orderBy('artworks.views', 'desc')
-    //     .limit(20)
-
-    //   console.log(artworksOfTags);
-    //   return { artworksOfTags }
-    // } catch (error) {
-    //   console.log('error: ', error);
-    // }
-  }
-
-  async getAllTagsOfArtwork({request}) {
-    try {
-      const artwork_id = request.input('artwork_id')
-      const tagsOfArtwork = await Db.select('tags.name').from('artworks')
-        .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-        .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-        .where('artworks_has_tags.artwork_id', artwork_id)
-
-      if (tagsOfArtwork) {
-        const artworksOfTags = await Db.select('artworks.*').from('artworks')
-          .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-          .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-          .whereRaw('tags.name = ?', tagsOfArtwork[0].name)
-          .orderBy('artworks.views', 'desc')
-          .limit(20)
-
-        return { tagsOfArtwork, artworksOfTags }
-      }
-      return { tagsOfArtwork }
-    } catch (error) {
-      console.log(error);
-    }
-  }
 }
 
 module.exports = UserController
