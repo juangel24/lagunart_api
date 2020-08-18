@@ -74,12 +74,7 @@ class ArtWorkController {
       const path = 'artwork/' + name
       const unicorn = await Drive.get(path)
 
-      
-      artwork.title = title
-      artwork.description = description
-      artwork.path_img = path
-      artwork.is_adult_content = is_adult_content
-      artwork.save()
+
 
       //ADD CHAPTER TO ARTWORK
     
