@@ -8,6 +8,9 @@ class Artwork extends Model {
   comments() {
     return this.hasMany('App/Models/Message')
   }
+  congratulations() {
+    return this.belongsToMany('App/Models/User').pivotTable('congratulations')
+  }
   chapters() {
     return this.hasMany('App/Models/Chapter')
   }
