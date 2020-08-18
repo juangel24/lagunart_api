@@ -41,7 +41,6 @@ Route.post('artwork/like', 'ArtWorkController.congratulate')
 // Route.post('/pruebon', 'ArtWorkController.tags')
 Route.post('/tags', 'ArtWorkController.tags')
 
-
 Route.get('search/home/:params', 'SearchController.home')
 Route.get('search/artworks/user/:params/:id', 'SearchController.user')
 
@@ -57,7 +56,7 @@ Route.get('tags/:params', 'TagController.index')
 Route.post('tags/create/', 'ArtworkController.tags')
 //Route.get('tags')
 // PAGE
-Route.post(':username', 'UserController.show')
+Route.post('user', 'UserController.show')
 Route.post('user/artworks', 'UserController.artworks')
 Route.post('user/favorites', 'UserController.favorites')
 Route.post('user/favorites/toggle', 'UserController.toggleFavorite')

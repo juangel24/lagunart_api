@@ -86,8 +86,9 @@ class UserController {
     return artworks
   }
 
-  async show({ params, request, response }) {
-    const userProfile = await User.findBy('username', params.username)
+  async show({ request, response }) {
+    const { userProfile_id, user_id } = request.all() 
+    const userProfile = await User.find(userProfile_id)
 
     // Check if user page exists
     if (!userProfile) { return response.status(404).send('Página no encontrada') }
@@ -95,7 +96,6 @@ class UserController {
     userProfile.followers = await userProfile.followers().getCount()
     userProfile.following = await userProfile.following().getCount()
 
-    const user_id = request.input('user_id')
     userProfile.youFollowHim = false
 
     if (user_id) {

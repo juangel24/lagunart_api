@@ -78,7 +78,6 @@ class ArtWorkController {
       const { title, description, art_subcategory_id } = request.all()
       const coverImg = respuesta.path_img
 
-
       const name = 'artwork' + Math.random() + '.' + respuesta.extension
 
       await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
@@ -131,7 +130,7 @@ class ArtWorkController {
     const check = await user.congratulations().where('artwork_id', artwork.id).first()
 
     console.log(user);
-    // console.log(artwork_id);
+
     console.log(artwork);
     console.log(check);
 
@@ -145,9 +144,6 @@ class ArtWorkController {
     }
   }
   async show({ request }) {
-    // const artwork_id = request._raw
-    // console.log(request._raw);
-    // console.log(request.all());
     const artwork_id = request.input('artwork_id')
     console.log('show ', artwork_id);
     const artwork = await Artwork.find(artwork_id)
@@ -166,7 +162,7 @@ class ArtWorkController {
     artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id',artwork.id).getCount()
 
     artwork.chapter = await artwork.chapters().where('artwork_id', artwork.id).fetch()
-    // console.log(artwork);
+
     return { artwork }
   }
 
