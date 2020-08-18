@@ -65,8 +65,16 @@ class UserController {
     }
 
     let artworks = await query.orderBy('artworks.updated_at', 'desc').fetch()
+    artworks = await this._withImages(artworks.rows)
 
-    return this._withImages(artworks.rows)
+    for (let i = 0; i < artworks.length; i++) {
+      const artwork = await Artwork.find(artworks[i].id)
+      if (await artwork.congratulations().where('id', user_id).first()) {
+        artworks[i].congratulated = true
+      } else { artworks[i].congratulated = false }
+    }
+
+    return artworks
   }
 
   async show({ params, request, response }) {
