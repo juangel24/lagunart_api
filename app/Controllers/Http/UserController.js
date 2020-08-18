@@ -146,7 +146,12 @@ class UserController {
 
   //to lo hizo el ioni, cualquier queja o sugerencia, métacla por el clo >:v
   async getusers(){
-    const users = await User.query().fetch()
+    var users = await User.query().select('users.id', 'users.name', 'profile_img', 'users.username')
+    .select(Db.raw('COUNT(followers.user_id) as seguidores'))
+    .join('followers','user_id','id')
+    .groupBy('user_id')
+    .orderBy('seguidores','desc')
+    .limit(20).fetch()
     return users
   }
 
