@@ -91,7 +91,7 @@ class ArtWorkController {
         chapter_artwork.artwork_id = artwork.id
         chapter_artwork.save()
       }
-
+  
       //ADD TAGS TO ARTWORK
       const tags = request.body.tags
       var tag_id = {}
