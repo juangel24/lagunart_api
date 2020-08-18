@@ -66,46 +66,48 @@ class ArtWorkController {
       const coverImg = respuesta.path_img
 
 
-      const name = 'artwork' + Math.random() + '.' + respuesta.extension 
+      const name = 'artwork' + Math.random() + '.' + respuesta.extension
+
       await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
       const path = 'artwork/' + name
       await Drive.get(path)
-      artwork.path_img = coverImg
 
 
+      artwork.title = title
+      artwork.description = description
+      artwork.path_img = path
+      artwork.is_adult_content = is_adult_content
+      artwork.save()
+
+      //ADD CHAPTER TO ARTWORK
+
+      const { title_chapter, content, name2 } = request.all()
+      const chapter_artwork = await artwork.chapters().first()
+      if (art_subcategory_id == 7 || art_subcategory_id == 8 || art_subcategory_id == 9 || art_subcategory_id == 10 || art_subcategory_id == 11) {
+        chapter_artwork.tittle = title_chapter
+        chapter_artwork.content = content
+        chapter_artwork.artwork_id = artwork.id
+        chapter_artwork.save()
+      }
+  
+      //ADD TAGS TO ARTWORK
       const tags = request.body.tags
       var tag_id = {}
-        for(let index = 0; index < tags.length; index++) {
-          const data = await Tags.findBy('name', tags[index])
-          if (!data) {
-            const tag = new Tags()
-            tag.name = tags[index]
-            tag.save()
-          }
-          tag_id = await Tags.findBy('name', tags[index])
-          await artwork.tags().save(tag_id)
+      for (let index = 0; index < tags.length; index++) {
+        const data = await Tags.findBy('name', tags[index])
+        if (!data) {
+          const tag = new Tags()
+          tag.name = tags[index]
+          tag.save()
         }
-      return { artwork, tags }
-    
+        tag_id = await Tags.findBy('name', tags[index])
+        await artwork.tags().save(tag_id)
+      }
+      return { artwork, chapter_artwork, tags }
+
     } catch (error) {
       console.log(error)
     }
-  }
-
-  async chapter({ auth, request, response, params }) {
-    const artwork = await Artwork.find(params.id)
-
-    const chapter = new Chapter()
-    const { title, content } = request.all()
-    chapter.tittle = title
-    chapter.content = content
-    chapter.artwork_id = artwork.id
-    const chapter_artwork = await artwork.chapters().getCount()
-
-    const number = chapter_artwork
-    chapter.order = number + 1
-    chapter.save()
-    return response.json(chapter)
   }
 
   async congratulate({ auth, response, request }) {
