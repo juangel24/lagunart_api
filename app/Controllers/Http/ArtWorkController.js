@@ -44,7 +44,6 @@ class ArtWorkController {
     artwork.is_private = is_private
 
     await artwork.save()
-    console.log(artwork);
     return response.json(artwork)
 
   }
@@ -63,31 +62,17 @@ class ArtWorkController {
       const respuesta = request.body.form
       const artwork_id = respuesta.artwork_id
       const artwork = await Artwork.find(artwork_id)
-
-      const { title, description, is_adult_content, art_subcategory_id } = request.all()
+      const { title, description, art_subcategory_id } = request.all()
       const coverImg = respuesta.path_img
 
 
       const name = 'artwork' + Math.random() + '.' + respuesta.extension 
-
       await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
       const path = 'artwork/' + name
-      const unicorn = await Drive.get(path)
+      await Drive.get(path)
+      artwork.path_img = coverImg
 
 
-
-      //ADD CHAPTER TO ARTWORK
-    
-      const { title_chapter, content, name2 } = request.all()
-      const chapter_artwork = await artwork.chapters().first()
-      if (art_subcategory_id == 7 || art_subcategory_id == 8 || art_subcategory_id == 9 || art_subcategory_id == 10 || art_subcategory_id == 11) {      
-        chapter_artwork.tittle = title_chapter
-        chapter_artwork.content = content
-        chapter_artwork.artwork_id = artwork.id
-        chapter_artwork.save()
-      }     
-
-      //ADD TAGS TO ARTWORK
       const tags = request.body.tags
       var tag_id = {}
         for(let index = 0; index < tags.length; index++) {
@@ -100,7 +85,7 @@ class ArtWorkController {
           tag_id = await Tags.findBy('name', tags[index])
           await artwork.tags().save(tag_id)
         }
-      return { artwork, chapter_artwork, tags }
+      return { artwork, tags }
     
     } catch (error) {
       console.log(error)
