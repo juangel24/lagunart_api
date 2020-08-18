@@ -77,7 +77,7 @@ class ArtWorkController {
 
       await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
       const path = 'artwork/' + name
-      const unicorn = await Drive.get(path)
+      await Drive.get(path)
 
 
       artwork.title = title
