@@ -62,7 +62,6 @@ class ArtWorkController {
     try {
       const respuesta = request.body.form
       const artwork_id = respuesta.artwork_id
-      return artwork_id
       const artwork = await Artwork.find(artwork_id)
 
       const { title, description, is_adult_content, art_subcategory_id } = request.all()
