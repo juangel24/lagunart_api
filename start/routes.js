@@ -53,7 +53,8 @@ Route.post('notifications/modify', 'NotificationController.update')
 
 //TAGS
 Route.get('tags/:params', 'TagController.index')
-Route.get('tags/create/','ArtworkController.tags')
+Route.post('tags/create/', 'ArtworkController.tags')
+//Route.get('tags')
 // PAGE
 Route.post(':username', 'UserController.show')
 Route.post('user/artworks', 'UserController.artworks')
