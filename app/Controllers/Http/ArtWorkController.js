@@ -28,7 +28,18 @@ class ArtWorkController {
       query.whereNotIn('artworks.id', notIn)
     }
 
-    return await query.orderBy('artworks.updated_at', 'desc').limit(10).fetch()
+    var artworks = await query.orderBy('artworks.updated_at', 'desc').limit(10).fetch()
+    artworks = artworks.rows
+    for (let index = 0; index < artworks.length; index++) {
+      const art = artworks[index];
+      let imgPath = art.path_img
+      let file = await Drive.get(imgPath)
+      let base64 = Buffer.from(file).toString('base64')
+
+      artworks[index].path_img = base64
+    }
+
+    return artworks
   }
 
   async store({ auth, request, response }) {
@@ -78,6 +89,7 @@ class ArtWorkController {
       artwork.title = title
       artwork.description = description
       artwork.path_img = path
+      artwork.extension = respuesta.extension
       artwork.save()
 
       //ADD CHAPTER TO ARTWORK
