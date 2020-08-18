@@ -68,7 +68,7 @@ class ArtWorkController {
       const artwork_id = request.input('artwork_id')
       const artwork = await Artwork.find(artwork_id)
       const { title, description, is_adult_content, path_img, extension } = request.all()
-      console.log(title);
+
       const validationOptions = { types: ['image'], size: '1mb', extnames: ['png', 'jpg', 'jpeg'] }
       const coverImg = path_img
 
@@ -209,7 +209,6 @@ class ArtWorkController {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
     const name = request.input('name')
-    console.log(artwork_id, name);
     const tag = new Tags()
     const data = await Tags.query().fetch()
     for (let i = 0; tag.length; i++) {

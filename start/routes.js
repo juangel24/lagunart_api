@@ -32,7 +32,7 @@ Route.get('artwork/information','ArtworkController.showInfoToEdit')
 Route.post('event/create', 'EventController.store')
 Route.patch('event/update', 'EventController.update')
 Route.delete('event/delete/:id', 'EventController.destroy')
-//COMMENTS 
+//COMMENTS
 Route.post('comment/artwork', 'ArtWorkController.comment')
 //Route.get('comment/artwork','ArtWorkController.showcomment')
 
@@ -61,5 +61,7 @@ Route.post('user/artworks', 'UserController.artworks')
 Route.post('user/favorites', 'UserController.favorites')
 Route.post('user/favorites/toggle', 'UserController.toggleFavorite')
 Route.post('user/follow', 'UserController.follow')
+Route.post('user/followers', 'UserController.followers')
+Route.post('user/following', 'UserController.following')
 Route.post('user/artworks/tag', 'UserController.getRelatesImagesByTag')
 Route.post('user/artworks/tags', 'UserController.getAllTagsOfArtwork')

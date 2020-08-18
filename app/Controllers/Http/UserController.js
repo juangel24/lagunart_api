@@ -171,7 +171,6 @@ class UserController {
         .where('artworks_has_tags.artwork_id', artwork_id)
       console.log(tagsOfArtwork);
 
-      let num = 0
       const artworksOfTags = await Db.select('artworks.*').from('artworks')
         .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
         .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
@@ -187,7 +186,6 @@ class UserController {
   }
 
   async getAllTagsOfArtwork({request}) {
-    // console.log();
     try {
       const artwork_id = request.input('artwork_id')
       console.log('getAllTagsOfArtwork', artwork_id);
