@@ -149,7 +149,7 @@ class ArtWorkController {
     let artwork = await Artwork.queryArt().where('artworks.id', artwork_id).first()
 
     // Adding comments array
-    artwork.commentsArray = await artwork.comments().fetch()
+    artwork.commentsArray = await artwork.comments().with('user').fetch()
     // congratulations array
     artwork.congratulationsArray = await artwork.congratulations().fetch()
     // chapters
