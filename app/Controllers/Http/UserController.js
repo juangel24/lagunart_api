@@ -86,8 +86,9 @@ class UserController {
     return artworks
   }
 
-  async show({ params, request, response }) {
-    const userProfile = await User.findBy('username', params.username)
+  async show({ request, response }) {
+    const { userProfile_id, user_id } = request.all() 
+    const userProfile = await User.find(userProfile_id)
 
     // Check if user page exists
     if (!userProfile) { return response.status(404).send('Página no encontrada') }
@@ -95,7 +96,6 @@ class UserController {
     userProfile.followers = await userProfile.followers().getCount()
     userProfile.following = await userProfile.following().getCount()
 
-    const user_id = request.input('user_id')
     userProfile.youFollowHim = false
 
     if (user_id) {
@@ -185,54 +185,6 @@ class UserController {
       artworks[index].path_img = base64
     }
     return artworks
-  }
-
-  async getRelatesImagesByTag({ request }) {
-    // try {
-    //   const artwork_id = request.input('artwork_id')
-    //   console.log('getRelatesImagesByTag', artwork_id);
-    //   const tagsOfArtwork = await Db.select('tags.*').from('artworks')
-    //     .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-    //     .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-    //     .where('artworks_has_tags.artwork_id', artwork_id)
-    //   console.log(tagsOfArtwork);
-
-    //   const artworksOfTags = await Db.select('artworks.*').from('artworks')
-    //     .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-    //     .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-    //     .whereRaw('tags.name = ?', tagsOfArtwork[0].name)
-    //     .orderBy('artworks.views', 'desc')
-    //     .limit(20)
-
-    //   console.log(artworksOfTags);
-    //   return { artworksOfTags }
-    // } catch (error) {
-    //   console.log('error: ', error);
-    // }
-  }
-
-  async getAllTagsOfArtwork({request}) {
-    try {
-      const artwork_id = request.input('artwork_id')
-      const tagsOfArtwork = await Db.select('tags.name').from('artworks')
-        .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-        .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-        .where('artworks_has_tags.artwork_id', artwork_id)
-
-      if (tagsOfArtwork) {
-        const artworksOfTags = await Db.select('artworks.*').from('artworks')
-          .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-          .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-          .whereRaw('tags.name = ?', tagsOfArtwork[0].name)
-          .orderBy('artworks.views', 'desc')
-          .limit(20)
-
-        return { tagsOfArtwork, artworksOfTags }
-      }
-      return { tagsOfArtwork }
-    } catch (error) {
-      console.log(error);
-    }
   }
 }
 
