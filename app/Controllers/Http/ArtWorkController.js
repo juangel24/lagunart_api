@@ -28,7 +28,7 @@ class ArtWorkController {
       query.whereNotIn('artworks.id', notIn)
     }
 
-    var artworks = await query.orderBy('artworks.updated_at', 'desc').limit(10).fetch()
+    var artworks = await query.orderBy('congratulations', 'desc').limit(10).fetch()
     artworks = artworks.rows
     for (let index = 0; index < artworks.length; index++) {
       const art = artworks[index];
