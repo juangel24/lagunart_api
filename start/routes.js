@@ -39,7 +39,7 @@ Route.post('comment/artwork', 'ArtWorkController.comment').middleware('auth')
 //Route.get('comment/artwork','ArtWorkController.showcomment')
 
 //LIKES
-Route.post('artwork/like', 'ArtWorkController.congratulate')
+Route.post('artwork/like', 'ArtWorkController.congratulate').middleware('auth')
 // Route.post('/pruebon', 'ArtWorkController.tags')
 Route.post('/tags', 'ArtWorkController.tags').middleware('auth')
 

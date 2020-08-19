@@ -12,7 +12,13 @@ class SearchController {
 
 		const busqueda = "%" + palabra + "%"
 
-		const artworks = await Artwork.query().whereRaw('title like ?', busqueda).fetch()
+		const artworks = await Artwork.query().select('artworks.id', 'artworks.title', 'artworks.description',
+			'artworks.is_adult_content', 'artworks.user_id', 'artworks.views', 'artworks.is_private',
+			'artworks.path_img', 'artworks.extension', 'artworks.created_at', 'artworks.updated_at',
+			'artworks.art_subcategory_id', 'art_subcategories.subcategory', 'art_categories.category')
+		.join('art_subcategories','art_subcategories.id','artworks.art_subcategory_id')
+		.join('art_categories', 'art_categories.id','art_subcategories.art_categories_id')
+		.whereRaw('title like ?', busqueda).fetch()
 		const usuarios = await User.query().whereRaw('name like ?', busqueda).orWhere('username', 'like', busqueda).fetch()
 		const eventos = await Event.query().whereRaw('tittle like ?', busqueda).fetch()
 		
