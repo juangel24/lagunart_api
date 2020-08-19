@@ -133,12 +133,24 @@ class ArtWorkController {
   async update_chapter({params, auth, request}) {
     
   }
-  async getChapters({request}) {
-    const artwork_id = request.input('artwork_id')
-    const artwork = await Artwork.find(artwork_id)
-    artwork.chapter = await artwork.chapters().fetch()
-    console.log(artwork)
-    return artwork
+  async getChapters({ request }) {
+    try {
+      const artwork_id = request.input('artwork_id')
+      const artwork = await Artwork.find(artwork_id.id)
+      artwork.chapter = await artwork.chapters().fetch()
+
+
+      const art = artwork;
+      let imgPath = art.path_img
+      let file = await Drive.get(imgPath)
+      let base64 = Buffer.from(file).toString('base64')
+      artwork.path_img = base64
+
+      return artwork
+      
+    } catch (error) {
+      console.log(error)
+    }
   }
   async congratulate({ auth, response, request }) {
     const user = await auth.getUser()
