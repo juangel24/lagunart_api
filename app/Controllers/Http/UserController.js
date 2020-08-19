@@ -19,7 +19,19 @@ class UserController {
     }
     if (notIn && notIn.length > 0) { query.whereNotIn('artworks.id', notIn) }
 
-    return await query.limit(20).orderBy('artworks.updated_at', 'desc').fetch()
+    var artworks =  await query.limit(20).orderBy('artworks.updated_at', 'desc').fetch()
+    artworks = artworks.rows
+    for (let index = 0; index < artworks.length; index++) {
+      const art = artworks[index];
+      let imgPath = art.path_img
+      let file = await Drive.get(imgPath)
+      let base64 = Buffer.from(file).toString('base64')
+
+      artworks[index].path_img = base64
+    }
+
+    return artworks
+
   }
 
   async favorites({ request }) {
@@ -28,18 +40,26 @@ class UserController {
   }
 
   async follow({ request, response }) {
-    const data = request.only(['follower', 'user_id'])
-    const follower = await Follower.query().where('follower', data.follower)
-      .andWhere('user_id', data.user_id).first()
-    const followedUser = await User.find(data.user_id)
 
-    if (follower) {
-      await followedUser.followers().detach([data.follower])
-      return response.send('Dejaste de seguir a ' + followedUser.username)
-    }
+      const data = request.only(['follower', 'user_id'])
+      console.log(data);
+      const follower = await Follower.query().where('follower', data.follower)
+        .andWhere('user_id', data.user_id).first()
 
-    await Follower.create(data)
-    return response.send('Sigues a ' + followedUser.username)
+      console.log(follower);
+
+      const followedUser = await User.find(data.user_id)
+
+      if (follower) {
+        await followedUser.followers().detach([data.follower])
+        console.log(followedUser.username);
+        return response.send(0)
+      }
+
+      await Follower.create(data)
+      console.log(followedUser.username);
+      return response.send(1)
+
   }
 
   async followers({ request }) {
@@ -77,8 +97,9 @@ class UserController {
     return artworks
   }
 
-  async show({ params, request, response }) {
-    const userProfile = await User.findBy('username', params.username)
+  async show({ request, response }) {
+    const { userProfile_id, user_id } = request.all() 
+    const userProfile = await User.find(userProfile_id)
 
     // Check if user page exists
     if (!userProfile) { return response.status(404).send('Página no encontrada') }
@@ -86,7 +107,6 @@ class UserController {
     userProfile.followers = await userProfile.followers().getCount()
     userProfile.following = await userProfile.following().getCount()
 
-    const user_id = request.input('user_id')
     userProfile.youFollowHim = false
 
     if (user_id) {
