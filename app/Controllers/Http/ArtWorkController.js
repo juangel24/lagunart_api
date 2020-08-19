@@ -64,10 +64,7 @@ class ArtWorkController {
     const user = await auth.getUser()
     const findUser = await User.find(user.id)
     const artworks = await findUser.artworks().last()
-    //const subcat = Database.select('artworks.*').from('art_subcategory_id').innerJoin('art_categories', 'art_categories.id', 'art_subcategories.art_categories_id')
-      //.innerJoin('artworks', 'artworks.art_subcategory_id', 'art_subcategories.id')
-      //.where('artworks.art_subcategory_id', artworks.id)
-      return { artworks }
+    return  { artworks } 
   }
 
   async update({ request }) {
@@ -91,14 +88,12 @@ class ArtWorkController {
       artwork.path_img = path
       artwork.extension = respuesta.extension
       artwork.save()
-
       //ADD CHAPTER TO ARTWORK
-
       const { title_chapter, content, name2 } = request.all()
       const chapter_artwork = new Chapter()
-      if (art_subcategory_id == 7 || art_subcategory_id == 8 || art_subcategory_id == 9 || art_subcategory_id == 10 || art_subcategory_id == 11) {
+      if (artwork.art_subcategory_id == 7 || artwork.art_subcategory_id == 8 || artwork.art_subcategory_id == 9 || artwork.art_subcategory_id == 10 || artwork.art_subcategory_id == 11) {
         chapter_artwork.tittle = title_chapter
-        chapter_artwork.content = content
+        chapter_artwork.content = respuesta.content
         chapter_artwork.artwork_id = artwork_id
         chapter_artwork.save()
       }
@@ -122,7 +117,21 @@ class ArtWorkController {
       console.log(error)
     }
   }
+  async chapter({ auth, request, response, params }) {
+    const artwork = await Artwork.find(params.id)
 
+    const chapter = new Chapter()
+    const { title, content } = request.all()
+    chapter.tittle = title
+    chapter.content = content
+    chapter.artwork_id = artwork.id
+    const chapter_artwork = await artwork.chapters().getCount()
+
+    const number = chapter_artwork
+    chapter.order = number + 1
+    chapter.save()
+    return response.json(chapter)
+  }
   async congratulate({ auth, response, request }) {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
