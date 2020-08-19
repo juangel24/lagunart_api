@@ -130,6 +130,16 @@ class ArtWorkController {
     chapter.save()
     return response.json(chapter)
   }
+  async update_chapter({params, auth, request}) {
+    
+  }
+  async getChapters({request}) {
+    const artwork_id = request.input('artwork_id')
+    const artwork = await Artwork.find(artwork_id)
+    artwork.chapter = await artwork.chapters().fetch()
+    console.log(artwork)
+    return artwork
+  }
   async congratulate({ auth, response, request }) {
     const user = await auth.getUser()
     const artwork_id = request.input('artwork_id')
