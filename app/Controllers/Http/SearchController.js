@@ -5,6 +5,7 @@ const Event = use('App/Models/Event');
 const User = use('App/Models/User')
 const ArtSubcategory = use('App/Models/ArtSubcategory');
 const ArtCategory = use('App/Models/ArtCategory');
+const Drive = use('Drive')
 class SearchController {
 	async home({params}){
 		const palabra = params.params
@@ -38,8 +39,22 @@ class SearchController {
 			arts[i].subcategory = subcatego
 			arts[i].category = categoria
 		}
+
+		try {
+		for (let index = 0; index < arts.length; index++) {
+			
+			const art = arts[index];
+			let imgPath = art.path_img
+			let file = await Drive.get(imgPath)
+			let base64 = Buffer.from(file).toString('base64')
+
+			arts[index].path_img = base64
+		}
 		
 		return {arts, eventos}
+		} catch (error) {
+			console.log(error);
+		}
 	}
 }
 

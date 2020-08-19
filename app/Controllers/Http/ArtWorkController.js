@@ -153,9 +153,9 @@ class ArtWorkController {
   }
   async show({ request }) {
     const artwork_id = request.input('artwork_id')
-    console.log('show ', artwork_id);
+    // console.log('show ', artwork_id);
     const artwork = await Artwork.find(artwork_id)
-    artwork.user = await Artwork.query().select('users.username', 'users.profile_img', 'users.cover_img', 'users.name').from ('users')
+    artwork.user = await Artwork.query().select('users.username', 'users.profile_img', 'users.cover_img', 'users.name', 'users.id').from ('users')
       .innerJoin('artworks', 'artworks.user_id', 'users.id')
       .where('artworks.id', artwork_id).fetch()
 
@@ -170,6 +170,23 @@ class ArtWorkController {
     artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id',artwork.id).getCount()
 
     artwork.chapter = await artwork.chapters().where('artwork_id', artwork.id).fetch()
+      
+    //   for (let index = 0; index < artwork.length; index++) {
+    //     console.log(artwork);
+    //     const art = artwork.comments[index];
+    //     let imgPath = art.path_img
+    //     let file = await Drive.get(imgPath)
+    //     let base64 = Buffer.from(file).toString('base64')
+
+    //     artwork.comments[index].path_img = base64
+    // }
+
+    const art = artwork;
+    let imgPath = art.path_img
+    let file = await Drive.get(imgPath)
+    let base64 = Buffer.from(file).toString('base64')
+
+    artwork.path_img = base64
 
     return { artwork }
   }

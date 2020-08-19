@@ -8,7 +8,6 @@ const Drive = use('Drive')
 class UserController {
   async artworks({ request }) {
     const { artist_id, category_id, subcategory_id, notIn } = request.all()
-    console.log(artist_id);
 
     const query = Artwork.queryArt().where('artworks.user_id', artist_id)
 
@@ -20,7 +19,19 @@ class UserController {
     }
     if (notIn && notIn.length > 0) { query.whereNotIn('artworks.id', notIn) }
 
-    return await query.limit(20).orderBy('artworks.updated_at', 'desc').fetch()
+    var artworks =  await query.limit(20).orderBy('artworks.updated_at', 'desc').fetch()
+    artworks = artworks.rows
+    for (let index = 0; index < artworks.length; index++) {
+      const art = artworks[index];
+      let imgPath = art.path_img
+      let file = await Drive.get(imgPath)
+      let base64 = Buffer.from(file).toString('base64')
+
+      artworks[index].path_img = base64
+    }
+
+    return artworks
+
   }
 
   async favorites({ request }) {
