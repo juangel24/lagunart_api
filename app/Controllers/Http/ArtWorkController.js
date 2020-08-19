@@ -96,21 +96,20 @@ class ArtWorkController {
         chapter_artwork.artwork_id = artwork_id
         chapter_artwork.save()
       }
-  
       //ADD TAGS TO ARTWORK
       const tags = request.body.tags
-      var tag_id = {}
-      for (let index = 0; index < tags.length; index++) {
-        const data = await Tags.findBy('name', tags[index])
-        if (!data) {
-          const tag = new Tags()
-          tag.name = tags[index]
-          tag.save()
-        }
-        tag_id = await Tags.findBy('name', tags[index])
-        await artwork.tags().save(tag_id)
-      }
-      return { artwork, chapter_artwork, tags }
+       var tag_id = {}
+       for (let index = 0; index < tags.length; index++) {
+         const data = await Tags.findBy('name', tags[index])
+         if (!data) {
+           const tag = new Tags()
+           tag.name = tags[index]
+           tag.save()
+         }
+         tag_id = await Tags.findBy('name', tags[index])
+         await artwork.tags().save(tag_id)
+    }
+      return { artwork, chapter_artwork }
 
     } catch (error) {
       console.log(error)
