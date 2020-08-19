@@ -101,7 +101,7 @@ class ArtWorkController {
         chapter_artwork.artwork_id = artwork_id
         chapter_artwork.save()
       }
-  
+
       //ADD TAGS TO ARTWORK
       const tags = request.body.tags
       var tag_id = {}
@@ -145,42 +145,23 @@ class ArtWorkController {
   }
   async show({ request }) {
     const artwork_id = request.input('artwork_id')
-    // console.log('show ', artwork_id);
-    const artwork = await Artwork.find(artwork_id)
-    artwork.user = await Artwork.query().select('users.username', 'users.profile_img', 'users.cover_img', 'users.name', 'users.id').from ('users')
-      .innerJoin('artworks', 'artworks.user_id', 'users.id')
-      .where('artworks.id', artwork_id).fetch()
 
-    artwork.comments = await Comment.query().select('comments.*', 'users.username', 'users.profile_img', 'users.cover_img').from('users')
-      .innerJoin('comments', 'comments.user_id', 'users.id')
-      .where('artwork_id', artwork.id).fetch()
-    artwork.commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
+    let artwork = await Artwork.queryArt().where('artworks.id', artwork_id).first()
 
-    artwork.congratulations = await Artwork.query().select("artworks.*", "congratulations.*").from('congratulations')
-      .innerJoin('artworks', 'artworks.id', 'congratulations.artwork_id')
-      .innerJoin('users', 'congratulations.user_id', 'users.id').fetch()
-    artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id',artwork.id).getCount()
+    // Adding comments array
+    artwork.commentsArray = await artwork.comments().fetch()
+    // congratulations array
+    artwork.congratulationsArray = await artwork.congratulations().fetch()
+    // chapters
+    artwork.chapters = await artwork.chapters().fetch()
 
-    artwork.chapter = await artwork.chapters().where('artwork_id', artwork.id).fetch()
-      
-    //   for (let index = 0; index < artwork.length; index++) {
-    //     console.log(artwork);
-    //     const art = artwork.comments[index];
-    //     let imgPath = art.path_img
-    //     let file = await Drive.get(imgPath)
-    //     let base64 = Buffer.from(file).toString('base64')
-
-    //     artwork.comments[index].path_img = base64
-    // }
-
-    const art = artwork;
-    let imgPath = art.path_img
+    let imgPath = artwork.path_img
     let file = await Drive.get(imgPath)
     let base64 = Buffer.from(file).toString('base64')
 
     artwork.path_img = base64
 
-    return { artwork }
+    return  artwork
   }
 
 
@@ -214,7 +195,7 @@ class ArtWorkController {
   async tags({ request, response }) {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
-   
+
     const name = request.input('name')
     const tag = new Tags()
     tag.name = name
