@@ -22,13 +22,14 @@ Route.get('usuarios', 'UserController.getusers')
 
 Route.post('artworks', 'ArtWorkController.index')
 Route.post('artwork/create', 'ArtWorkController.store').middleware('auth')
-Route.post('create/artwork/chapter/:id', 'ArtWorkController.chapter').middleware('auth')
+Route.post('artwork/chapter/create/', 'ArtWorkController.chapter').middleware('auth')
 Route.patch('artwork/update', 'ArtWorkController.update').middleware('auth')
 Route.delete('artwork/delete/:id', 'ArtWorkController.destroy').middleware('auth')
 Route.post('artworks/show', 'ArtWorkController.show')
 Route.get('artwork/information', 'ArtworkController.showInfoToEdit')
-Route.get('artwork/chapter/update/:id', 'ArtworkController.update_chapter')
-Route.post('artwork/chapters','ArtworkController.getChapters')
+Route.patch('artwork/chapter/update/', 'ArtworkController.update_chapter')
+Route.post('artwork/chapters', 'ArtworkController.getChapters')
+Route.post('artwork/chapter','ArtworkController.artwork_id')
 
 //EVENTS
 Route.post('event/create', 'EventController.store').middleware('auth')
