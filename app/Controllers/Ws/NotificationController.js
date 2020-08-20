@@ -42,7 +42,7 @@ class NotificationController {
         let artwork = await Artwork.find(variable.artwork)
         let dueno = await User.find(artwork.user_id)
         let notificacion = new Notification()
-        notificacion.content = "noticias de tu publ."
+        notificacion.content = "noticias de tu publicación"
         notificacion.type = variable.type
         notificacion.user_id = user.id
         await notificacion.save()

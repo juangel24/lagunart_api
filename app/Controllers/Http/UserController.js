@@ -190,6 +190,12 @@ class UserController {
     let retorno = await user.user_notifications().orderBy('created_at','desc').fetch()
     return retorno
   }
+  async rmvnot({request}){
+    const { params, paramsdos } = request.all()
+    let user = await User.findBy('id', params)
+    let notificaiones = await user.user_notifications().fetch()
+    return notificaiones
+  }
 
   async _withImages(artworks) {
     for (let index = 0; index < artworks.length; index++) {
