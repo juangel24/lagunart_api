@@ -42,22 +42,22 @@ class UserController {
   async follow({ request, response }) {
 
       const data = request.only(['follower', 'user_id'])
-      console.log(data);
+      // console.log(data);
       const follower = await Follower.query().where('follower', data.follower)
         .andWhere('user_id', data.user_id).first()
 
-      console.log(follower);
+      // console.log(follower);
 
       const followedUser = await User.find(data.user_id)
 
       if (follower) {
         await followedUser.followers().detach([data.follower])
-        console.log(followedUser.username);
+        // console.log(followedUser.username);
         return response.send(0)
       }
 
       await Follower.create(data)
-      console.log(followedUser.username);
+      // console.log(followedUser.username);
       return response.send(1)
 
   }
