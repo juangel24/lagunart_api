@@ -200,7 +200,6 @@ class UserController {
 
       artworks[index].path_img = base64
     }
-
     return artworks
   }
 }
