@@ -18,7 +18,7 @@ class NotificationController {
         let segu = await user.followers().fetch()
         let seguidores = segu.rows
         let notificacion = new Notification()
-        notificacion.content = "hay una nueva publicación de "+user.username
+        notificacion.content = user.username + " publicó"
         notificacion.type = variable.type
         notificacion.user_id = variable.user
         await notificacion.save()
@@ -42,7 +42,7 @@ class NotificationController {
         let artwork = await Artwork.find(variable.artwork)
         let dueno = await User.find(artwork.user_id)
         let notificacion = new Notification()
-        notificacion.content = "noticias de tu publicación"
+        notificacion.content = "noticias de tu publ."
         notificacion.type = variable.type
         notificacion.user_id = user.id
         await notificacion.save()

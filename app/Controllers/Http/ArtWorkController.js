@@ -188,7 +188,7 @@ class ArtWorkController {
       await user.congratulations().detach(artwork.id)
       return response.send('quitaste tus felicitaciones')
     }
-   else {
+    else {
       await user.congratulations().save(artwork)
       return response.send('felicidades')
     }
@@ -197,7 +197,7 @@ class ArtWorkController {
 
   }
   async show({ request }) {
-    const artwork_id = request.input('artwork_id')
+    const { artwork_id, user_id } = request.all()
 
     let artwork = await Artwork.queryArt().where('artworks.id', artwork_id).first()
 
@@ -208,15 +208,32 @@ class ArtWorkController {
     // chapters
     artwork.chapters = await artwork.chapters().fetch()
 
+    // img base64 encoding
     let imgPath = artwork.path_img
     let file = await Drive.get(imgPath)
     let base64 = Buffer.from(file).toString('base64')
-
     artwork.path_img = base64
 
-    return  artwork
-  }
+    artwork.followedUser = false
+    artwork.congratulated = false
 
+    if (user_id) {
+      const user = await User.find(user_id)
+      const artworkUser = await User.find(artwork.user_id)
+
+      if (user) {
+        if (await artworkUser.followers().where('follower', user.id).first()) {
+          artwork.followedUser = true
+        }
+      }
+
+      if (await artwork.congratulations().where('id', user_id).first()) {
+        artwork.congratulated = true
+      }
+    }
+
+    return artwork
+  }
 
   async comment({ auth, request, params, response }) {
     const user = await auth.getUser()
@@ -232,9 +249,7 @@ class ArtWorkController {
     return response.json(comment)
   }
 
-  async stream({ }) {
-
-  }
+  async stream({}) {}
 
   async destroy({ params, response }) {
     const artwork = await Artwork.find(params.id)
