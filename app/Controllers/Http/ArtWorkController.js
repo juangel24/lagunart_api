@@ -157,6 +157,8 @@ class ArtWorkController {
     artwork.path_img = base64
 
     artwork.followedUser = false
+    artwork.congratulated = false
+
     if (user_id) {
       const user = await User.find(user_id)
       const artworkUser = await User.find(artwork.user_id)
@@ -166,11 +168,10 @@ class ArtWorkController {
           artwork.followedUser = true
         }
       }
-    }
 
-    artwork.congratulated = false
-    if (await artwork.congratulations().where('id', user_id).first()) {
-      artwork.congratulated = true
+      if (await artwork.congratulations().where('id', user_id).first()) {
+        artwork.congratulated = true
+      }
     }
 
     return artwork
