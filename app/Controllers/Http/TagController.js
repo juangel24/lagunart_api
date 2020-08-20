@@ -1,6 +1,7 @@
 'use strict'
 const Tag = use('App/Models/Tag');
 const Db = use('Database')
+const Drive = use('Drive')
 class TagController {
 	async index({ params }) {
 		const variable = "%" + params.params + "%"
@@ -15,17 +16,35 @@ class TagController {
 			  .join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
 			  .join('tags', 'tags.id', 'artworks_has_tags.tag_id')
 			  .where('artworks_has_tags.artwork_id', artwork_id)
+
+			  var array = []
+			  tagsOfArtwork.forEach(element => {
+				array.push(element.name)
+			  });
 	  
-			// if (tagsOfArtwork) {
-			//   const artworksOfTags = await Db.select('artworks.*').from('artworks')
-			// 	.join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
-			// 	.join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-			// 	.whereRaw('tags.name = ?', tagsOfArtwork[0].name)
-			// 	.orderBy('artworks.views', 'desc')
-			// 	.limit(20)
+			if (tagsOfArtwork.length !== 0) {
+				console.log(array);
+			  	const artworksOfTags = await Db.select('artworks.*').from('artworks')
+					.join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
+					.join('tags', 'tags.id', 'artworks_has_tags.tag_id')
+					// .whereRaw('tags.name = ?', array)
+					.whereIn('tags.name', array)
+					.orderBy('artworks.views', 'desc')
+					.limit(20)
+
+				// var artworks = await query.orderBy('congratulations', 'desc').limit(10).fetch()
+				// var artworks = artworks.rows
+				for (let index = 0; index < artworksOfTags.length; index++) {
+					  const art = artworksOfTags[index];
+					  let imgPath = art.path_img
+					  let file = await Drive.get(imgPath)
+					  let base64 = Buffer.from(file).toString('base64')
+				
+					  artworksOfTags[index].path_img = base64
+				}
 	  
-			//   return { tagsOfArtwork, artworksOfTags }
-			// }
+			  return { tagsOfArtwork, artworksOfTags }
+			}
 				return { tagsOfArtwork }
 			} catch (error) {
 				console.log(error);
