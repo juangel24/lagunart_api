@@ -14,6 +14,8 @@ class UserSchema extends Schema {
       table.date('birth').notNullable()
       table.string('profile_img', 45)
       table.string('cover_img', 45)
+      table.string('profile_extension',45)
+      table.string('cover_extension',45)
       table.timestamps()
     })
   }

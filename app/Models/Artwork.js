@@ -6,7 +6,10 @@ const Db = use('Database')
 
 class Artwork extends Model {
   comments() {
-    return this.hasMany('App/Models/Message')
+    return this.hasMany('App/Models/Comment')
+  }
+  congratulations() {
+    return this.belongsToMany('App/Models/User').pivotTable('congratulations')
   }
   chapters() {
     return this.hasMany('App/Models/Chapter')

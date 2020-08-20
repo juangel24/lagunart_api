@@ -28,7 +28,18 @@ class ArtWorkController {
       query.whereNotIn('artworks.id', notIn)
     }
 
-    return await query.orderBy('artworks.updated_at', 'desc').limit(10).fetch()
+    var artworks = await query.orderBy('congratulations', 'desc').limit(10).fetch()
+    artworks = artworks.rows
+    for (let index = 0; index < artworks.length; index++) {
+      const art = artworks[index];
+      let imgPath = art.path_img
+      let file = await Drive.get(imgPath)
+      let base64 = Buffer.from(file).toString('base64')
+
+      artworks[index].path_img = base64
+    }
+
+    return artworks
   }
 
   async store({ auth, request, response }) {
@@ -65,7 +76,6 @@ class ArtWorkController {
       const { title, description, art_subcategory_id } = request.all()
       const coverImg = respuesta.path_img
 
-
       const name = 'artwork' + Math.random() + '.' + respuesta.extension
 
       await Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64'))
@@ -75,7 +85,8 @@ class ArtWorkController {
 
       artwork.title = title
       artwork.description = description
-      artwork.path_img = name
+      artwork.path_img = path
+      artwork.extension = respuesta.extension
       artwork.save()
 
       //ADD CHAPTER TO ARTWORK
@@ -88,7 +99,7 @@ class ArtWorkController {
         chapter_artwork.artwork_id = artwork_id
         chapter_artwork.save()
       }
-  
+
       //ADD TAGS TO ARTWORK
       const tags = request.body.tags
       var tag_id = {}
@@ -121,27 +132,49 @@ class ArtWorkController {
       await await user.congratulations().detach(artwork.id)
       return response.send('quitaste tus felicitaciones')
     }
-   else {
+    else {
       await user.congratulations().save(artwork)
       return response.send('felicidades')
     }
   }
   async show({ request }) {
-    const artwork_id = request.input('artwork_id')
-    const artwork = await Artwork.find(artwork_id)
-    artwork.comments = await Comment.query().where('artwork_id', artwork.id).fetch()
-    artwork.commentsCount = await Comment.query().where('artwork_id', artwork.id).getCount()
+    const { artwork_id, user_id } = request.all()
 
-    artwork.congratulations = await Artwork.query().select("artworks.*", "congratulations.*").from('congratulations')
-      .innerJoin('artworks', 'artworks.id', 'congratulations.artwork_id')
-      .innerJoin('users', 'congratulations.user_id', 'users.id').fetch()
-    artwork.congratulationsCount = await Database.from('congratulations').where('artwork_id',artwork.id).getCount()
+    let artwork = await Artwork.queryArt().where('artworks.id', artwork_id).first()
 
-    artwork.chapter = await artwork.chapters().where('artwork_id', artwork.id).fetch()
+    // Adding comments array
+    artwork.commentsArray = await artwork.comments().with('user').fetch()
+    // congratulations array
+    artwork.congratulationsArray = await artwork.congratulations().fetch()
+    // chapters
+    artwork.chapters = await artwork.chapters().fetch()
 
-    return { artwork }
+    // img base64 encoding
+    let imgPath = artwork.path_img
+    let file = await Drive.get(imgPath)
+    let base64 = Buffer.from(file).toString('base64')
+    artwork.path_img = base64
+
+    artwork.followedUser = false
+    artwork.congratulated = false
+
+    if (user_id) {
+      const user = await User.find(user_id)
+      const artworkUser = await User.find(artwork.user_id)
+
+      if (user) {
+        if (await artworkUser.followers().where('follower', user.id).first()) {
+          artwork.followedUser = true
+        }
+      }
+
+      if (await artwork.congratulations().where('id', user_id).first()) {
+        artwork.congratulated = true
+      }
+    }
+
+    return artwork
   }
-
 
   async comment({ auth, request, params, response }) {
     const user = await auth.getUser()
@@ -157,9 +190,7 @@ class ArtWorkController {
     return response.json(comment)
   }
 
-  async stream({ }) {
-
-  }
+  async stream({}) {}
 
   async destroy({ params, response }) {
     const artwork = await Artwork.find(params.id)
@@ -173,7 +204,7 @@ class ArtWorkController {
   async tags({ request, response }) {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id)
-   
+
     const name = request.input('name')
     const tag = new Tags()
     tag.name = name

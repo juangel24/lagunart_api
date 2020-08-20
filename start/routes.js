@@ -10,6 +10,8 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
+Route.get('', () => "I'm a practice :)")
+
 // Auth
 Route.post('join', 'AuthController.join')
 Route.post('login', 'AuthController.login')
@@ -37,9 +39,9 @@ Route.post('comment/artwork', 'ArtWorkController.comment')
 //Route.get('comment/artwork','ArtWorkController.showcomment')
 
 //LIKES
-Route.post('artwork/like', 'ArtWorkController.congratulate')
-//Route.post('/pruebon', 'ArtWorkController.tags')
-
+Route.post('artwork/like', 'ArtWorkController.congratulate').middleware('auth')
+// Route.post('/pruebon', 'ArtWorkController.tags')
+Route.post('/tags', 'ArtWorkController.tags')
 
 Route.get('search/home/:params', 'SearchController.home')
 Route.get('search/artworks/user/:params/:id', 'SearchController.user')
@@ -54,12 +56,14 @@ Route.post('notifications/modify', 'NotificationController.update')
 //TAGS
 Route.get('tags/:params', 'TagController.index')
 Route.post('tags/create/', 'ArtworkController.tags')
+Route.post('user/artworks/tags', 'TagController.getAllTagsOfArtwork')
 //Route.get('tags')
 // PAGE
-Route.post(':username', 'UserController.show')
+Route.post('user', 'UserController.show')
 Route.post('user/artworks', 'UserController.artworks')
 Route.post('user/favorites', 'UserController.favorites')
 Route.post('user/favorites/toggle', 'UserController.toggleFavorite')
 Route.post('user/follow', 'UserController.follow')
 Route.post('user/followers', 'UserController.followers')
 Route.post('user/following', 'UserController.following')
+Route.get('user/notific/:params', 'UserController.notificaciones')
