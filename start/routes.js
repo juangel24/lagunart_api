@@ -10,6 +10,8 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
+Route.get('', () => "I'm a practice :)")
+
 // Auth
 Route.post('join', 'AuthController.join')
 Route.post('login', 'AuthController.login')
