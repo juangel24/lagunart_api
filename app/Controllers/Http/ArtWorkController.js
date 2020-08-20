@@ -129,16 +129,11 @@ class ArtWorkController {
 
     const check = await user.congratulations().where('artwork_id', artwork.id).first()
 
-    console.log(user);
-
-    console.log(artwork);
-    console.log(check);
-
     if (check) {
       await await user.congratulations().detach(artwork.id)
       return response.send('quitaste tus felicitaciones')
     }
-   else {
+    else {
       await user.congratulations().save(artwork)
       return response.send('felicidades')
     }
@@ -161,7 +156,7 @@ class ArtWorkController {
 
     artwork.path_img = base64
 
-    return  artwork
+    return artwork
   }
 
 
