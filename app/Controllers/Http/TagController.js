@@ -27,13 +27,10 @@ class TagController {
 			  	const artworksOfTags = await Db.select('artworks.*').from('artworks')
 					.join('artworks_has_tags', 'artworks_has_tags.artwork_id', 'artworks.id')
 					.join('tags', 'tags.id', 'artworks_has_tags.tag_id')
-					// .whereRaw('tags.name = ?', array)
 					.whereIn('tags.name', array)
 					.orderBy('artworks.views', 'desc')
 					.limit(20)
 
-				// var artworks = await query.orderBy('congratulations', 'desc').limit(10).fetch()
-				// var artworks = artworks.rows
 				for (let index = 0; index < artworksOfTags.length; index++) {
 					  const art = artworksOfTags[index];
 					  let imgPath = art.path_img
