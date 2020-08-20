@@ -185,6 +185,11 @@ class UserController {
     .limit(20).fetch()
     return users
   }
+  async notificaciones({params}){
+    let user = await User.findBy('id',params.params)
+    let retorno = await user.user_notifications().orderBy('created_at','desc').fetch()
+    return retorno
+  }
 
   async _withImages(artworks) {
     for (let index = 0; index < artworks.length; index++) {
@@ -195,7 +200,6 @@ class UserController {
 
       artworks[index].path_img = base64
     }
-
     return artworks
   }
 }
