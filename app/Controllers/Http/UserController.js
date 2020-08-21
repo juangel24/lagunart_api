@@ -40,26 +40,16 @@ class UserController {
   }
 
   async follow({ request, response }) {
+      const { follower, user_id } = request.all()
+      const userToFollow = await User.find(user_id)
 
-      const data = request.only(['follower', 'user_id'])
-      // console.log(data);
-      const follower = await Follower.query().where('follower', data.follower)
-        .andWhere('user_id', data.user_id).first()
-
-      // console.log(follower);
-
-      const followedUser = await User.find(data.user_id)
-
-      if (follower) {
-        await followedUser.followers().detach([data.follower])
-        // console.log(followedUser.username);
+      if ( await userToFollow.followers().where('id', follower).first() ) {
+        await userToFollow.followers().detach(follower)
         return response.send(0)
       }
 
-      await Follower.create(data)
-      // console.log(followedUser.username);
+      await userToFollow.followers().attach(follower)
       return response.send(1)
-
   }
 
   async followers({ request }) {
@@ -88,8 +78,7 @@ class UserController {
     artworks = await this._withImages(artworks.rows)
 
     for (let i = 0; i < artworks.length; i++) {
-      const artwork = await Artwork.find(artworks[i].id)
-      if (await artwork.congratulations().where('id', user_id).first()) {
+      if (await artworks[i].congratulations().where('id', user_id).first()) {
         artworks[i].congratulated = true
       } else { artworks[i].congratulated = false }
     }
@@ -98,7 +87,7 @@ class UserController {
   }
 
   async show({ request, response }) {
-    const { userProfile_id, user_id } = request.all() 
+    const { userProfile_id, user_id } = request.all()
     const userProfile = await User.find(userProfile_id)
 
     // Check if user page exists
