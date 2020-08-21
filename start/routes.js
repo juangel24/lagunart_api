@@ -21,6 +21,7 @@ Route.post('password/reset', 'AuthController.resetPassword')
 
 Route.post('home', 'UserController.home')
 Route.get('usuarios', 'UserController.getusers')
+Route.post('cambiar/imagen', 'UserController.cambiar_imagen').middleware('auth')
 
 Route.post('artworks', 'ArtWorkController.index')
 Route.post('artwork/create', 'ArtWorkController.store').middleware('auth')
@@ -70,4 +71,4 @@ Route.post('user/follow', 'UserController.follow')
 Route.post('user/followers', 'UserController.followers')
 Route.post('user/following', 'UserController.following')
 Route.get('user/notific/:params', 'UserController.notificaciones')
-// Route.post('user/delete', 'UserController.rmvnot')
+Route.post('user/delete', 'UserController.rmvnot')

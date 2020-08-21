@@ -177,12 +177,26 @@ class UserController {
 
   //to lo hizo el ioni, cualquier queja o sugerencia, métacla por el clo >:v
   async getusers(){
-    var users = await User.query().select('users.id', 'users.name', 'profile_img', 'users.username')
+    var users = await User.query().select('users.id', 'users.name', 'profile_img', 'profile_extension','users.username')
     .select(Db.raw('COUNT(followers.user_id) as seguidores'))
     .join('followers','user_id','id')
     .groupBy('user_id')
     .orderBy('seguidores','desc')
     .limit(20).fetch()
+
+    users = users.rows
+    for (let index = 0; index < users.length; index++) {
+      const art = users[index];
+      let imgPath = art.profile_img
+      if (imgPath) {
+        let file = await Drive.get(imgPath)
+        let base64 = Buffer.from(file, 'base64').toString('base64')
+        users[index].profile_img = base64
+      }else {
+        users[index].profile_img = null
+      }
+
+    }
     return users
   }
   async notificaciones({params}){
@@ -191,9 +205,11 @@ class UserController {
     return retorno
   }
   async rmvnot({request}){
-    const { params, paramsdos } = request.all()
-    let user = await User.findBy('id', params)
-    let notificaiones = await user.user_notifications().fetch()
+    const { usario, notify } = request.all()
+    let user = await User.find(usario)
+
+    let notificaiones = await Db.table('notification_receivers').where('notification_id',notify).where('user_id', user.id).update({is_viewed:1})
+
     return notificaiones
   }
 
@@ -207,6 +223,23 @@ class UserController {
       artworks[index].path_img = base64
     }
     return artworks
+  }
+
+  async cambiar_imagen({request, auth}){
+    const {path_img, extension} = request.all()
+    const coverImg = path_img
+    const user = await auth.getUser()
+
+    const name = 'profile' + Math.random() + '.' + extension
+
+    await Drive.put('profile/' + name, Buffer.from(coverImg, 'base64'))
+    const path = 'profile/' + name
+    await Drive.get(path)
+
+    user.profile_img = path
+    user.profile_extension = extension
+    await user.save()
+    return user
   }
 }
 
