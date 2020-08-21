@@ -66,7 +66,6 @@ class ArtWorkController {
     const artworks = await findUser.artworks().last()
     //const sub = Database()
     return { artworks }
-    
   }
 
   async update({ request }) {
@@ -151,7 +150,7 @@ class ArtWorkController {
     }
     art.save()
     return { k, art}
-  
+
   }
   async getChapters({ request }) {
     try {
@@ -167,7 +166,7 @@ class ArtWorkController {
       artwork.path_img = base64
 
       return artwork
-      
+
     } catch (error) {
       console.log(error)
     }
@@ -237,16 +236,17 @@ class ArtWorkController {
     return artwork
   }
 
-  async comment({ auth, request, params, response }) {
+  async comment({ auth, request, response }) {
     const user = await auth.getUser()
-    const artwork_id = request.input('artwork_id')
-    const artwork = await Artwork.find(artwork_id)
+    const { artwork_id, content } = request.all()
 
     const comment = new Comment()
-    comment.content = request.input('content')
+    comment.content = content
     comment.user_id = user.id
-    comment.artwork_id = artwork.id
-    comment.save()
+    comment.artwork_id = artwork_id
+    await comment.save()
+
+    comment.user = user
 
     return response.json(comment)
   }
