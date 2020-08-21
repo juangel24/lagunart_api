@@ -28,7 +28,7 @@ Route.post('artwork/chapter/create/', 'ArtWorkController.chapter').middleware('a
 Route.patch('artwork/update', 'ArtWorkController.update').middleware('auth')
 Route.delete('artwork/delete/:id', 'ArtWorkController.destroy').middleware('auth')
 Route.post('artworks/show', 'ArtWorkController.show')
-Route.get('artwork/information', 'ArtworkController.showInfoToEdit')
+Route.get('artwork/information', 'ArtworkController.showInfoToEdit').middleware('auth')
 Route.patch('artwork/chapter/update/', 'ArtworkController.update_chapter')
 Route.post('artwork/chapters', 'ArtworkController.getChapters')
 Route.post('artwork/chapter','ArtworkController.artwork_id')
