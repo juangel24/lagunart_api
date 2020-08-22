@@ -12,7 +12,7 @@ const Drive = use('Drive')
 const Helpers = use('Helpers');
 const { validate } = use('Validator')
 
-class ArtWorkController {
+class ArtworkController {
   async index({ request }) {
     const { category_id, subcategory_id, notIn } = request.all()
 
@@ -284,4 +284,4 @@ class ArtWorkController {
   }
 }
 
-module.exports = ArtWorkController
+module.exports = ArtworkController
