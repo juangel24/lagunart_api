@@ -87,7 +87,7 @@ class ArtworkController {
       artwork.description = description
       artwork.path_img = path
       artwork.extension = respuesta.extension
-      artwork.save()
+      await artwork.save()
       //ADD CHAPTER TO ARTWORK
       const { title_chapter, content, name2 } = request.all()
       const chapter_artwork = new Chapter()
@@ -95,7 +95,7 @@ class ArtworkController {
         chapter_artwork.tittle = title_chapter
         chapter_artwork.content = respuesta.content
         chapter_artwork.artwork_id = artwork_id
-        chapter_artwork.save()
+        await chapter_artwork.save()
       }
       //ADD TAGS TO ARTWORK
       const tags = request.body.tags
@@ -105,7 +105,7 @@ class ArtworkController {
          if (!data) {
            const tag = new Tags()
            tag.name = tags[index]
-           tag.save()
+           await tag.save()
          }
          tag_id = await Tags.findBy('name', tags[index])
          await artwork.tags().save(tag_id)
