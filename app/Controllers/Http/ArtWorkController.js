@@ -12,7 +12,7 @@ const Drive = use('Drive')
 const Helpers = use('Helpers');
 const { validate } = use('Validator')
 
-class ArtWorkController {
+class ArtworkController {
   async index({ request }) {
     const { category_id, subcategory_id, notIn } = request.all()
 
@@ -28,7 +28,7 @@ class ArtWorkController {
       query.whereNotIn('artworks.id', notIn)
     }
 
-    var artworks = await query.orderBy('congratulations', 'desc').limit(10).fetch()
+    var artworks = await query.limit(10).fetch()
     artworks = artworks.rows
     for (let index = 0; index < artworks.length; index++) {
       const art = artworks[index];
@@ -87,7 +87,7 @@ class ArtWorkController {
       artwork.description = description
       artwork.path_img = path
       artwork.extension = respuesta.extension
-      artwork.save()
+      await artwork.save()
       //ADD CHAPTER TO ARTWORK
       const { title_chapter, content, name2 } = request.all()
       const chapter_artwork = new Chapter()
@@ -95,7 +95,7 @@ class ArtWorkController {
         chapter_artwork.tittle = title_chapter
         chapter_artwork.content = respuesta.content
         chapter_artwork.artwork_id = artwork_id
-        chapter_artwork.save()
+        await chapter_artwork.save()
       }
       //ADD TAGS TO ARTWORK
       const tags = request.body.tags
@@ -105,7 +105,7 @@ class ArtWorkController {
          if (!data) {
            const tag = new Tags()
            tag.name = tags[index]
-           tag.save()
+           await tag.save()
          }
          tag_id = await Tags.findBy('name', tags[index])
          await artwork.tags().save(tag_id)
@@ -284,4 +284,4 @@ class ArtWorkController {
   }
 }
 
-module.exports = ArtWorkController
+module.exports = ArtworkController
