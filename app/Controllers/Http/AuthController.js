@@ -4,6 +4,7 @@ const PasswordReset = use('App/Models/PasswordReset')
 const Env = use('Env')
 const jwt = require('jsonwebtoken')
 const Mail = use('Mail')
+const Drive = use('Drive')
 
 class AuthController {
   async join({ auth, request, response }) {
@@ -28,6 +29,14 @@ class AuthController {
 
     if (await auth.attempt(username, password)) {
       let user = await User.findBy('username', username)
+      let imgPath = user.profile_img
+      if (imgPath) {
+        let file = await Drive.get(imgPath)
+        let base64 = Buffer.from(file, 'base64').toString('base64')
+        user.profile_img = base64
+      }else {
+        user.profile_img = null
+      }
       return this._userWithToken(auth, user)
     }
   }
