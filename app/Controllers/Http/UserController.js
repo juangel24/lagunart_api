@@ -189,8 +189,14 @@ class UserController {
     return users
   }
   async notificaciones({params}){
-    let user = await User.findBy('id',params.params)
-    let retorno = await user.user_notifications().orderBy('created_at','desc').fetch()
+    let retorno = await Db.table('users').select('notifications.id', 'notifications.content',
+      'art_categories.category', 'notification_receivers.is_viewed')
+    .join('notification_receivers', 'notification_receivers.user_id', 'users.id')
+    .join('notifications', 'notifications.id', 'notification_receivers.notification_id')
+    .join('artworks', 'artworks.id', 'notifications.artwork_id')
+    .join('art_subcategories', 'art_subcategories.id', 'artworks.art_subcategory_id')
+    .join('art_categories', 'art_categories.id', 'art_subcategories.art_categories_id')
+    .where('users.id', params.params)
     return retorno
   }
   async rmvnot({request}){

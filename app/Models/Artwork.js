@@ -17,6 +17,9 @@ class Artwork extends Model {
   tags() {
     return this.belongsToMany('App/Models/Tag').pivotTable('artworks_has_tags')
   }
+  notifications(){
+    return this.hasMany('App/Models/Notification')
+  }
 
   // QUERY - Get artworks with commonly required data
   static queryArt() {
