@@ -171,6 +171,35 @@ class ArtworkController {
       console.log(error)
     }
   }
+  async getImage({ request }){
+    try {
+      const artwork_id = request.input('artwork_id')
+      const artwork = await Artwork.find(artwork_id.id)
+      const art = artwork;
+      let imgPath = art.path_img
+      let file = await Drive.get(imgPath)
+      let base64 = Buffer.from(file).toString('base64')
+      artwork.path_img = base64
+
+      return artwork
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  async update_image({ request }) {
+    const artwork_id = request.input('artwork_id')
+    const art = await Artwork.find(artwork_id.id)
+    const { description, title, path_img } = request.all()
+    let imgPath = art.path_img
+    let file = await Drive.get(imgPath)
+    let base64 = Buffer.from(file).toString('base64')
+    art.path_img = base64
+    art.title = title
+    art.description = description
+    art.merge()
+    return { art }
+  }
   async artwork_id({request}) {
     const artwork_id = request.input('artwork_id')
     const artwork = await Artwork.find(artwork_id.id)

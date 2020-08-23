@@ -33,7 +33,8 @@ Route.get('artwork/information', 'ArtworkController.showInfoToEdit').middleware(
 Route.patch('artwork/chapter/update/', 'ArtworkController.update_chapter')
 Route.post('artwork/chapters', 'ArtworkController.getChapters')
 Route.post('artwork/chapter','ArtworkController.artwork_id')
-
+Route.post('artwork/image', 'ArtworkController.getImage')
+Route.patch('artwork/image/edit', 'ArtworkController.update_image')
 //EVENTS
 Route.post('event/create', 'EventController.store').middleware('auth')
 Route.patch('event/update', 'EventController.update').middleware('auth')
