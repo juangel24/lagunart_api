@@ -174,7 +174,7 @@ class UserController {
     .limit(20).fetch()
 
     users = users.rows
-    for (let index = 0; index < users.length; index++) {
+    for (let index = 0; index < users.length && index <= 10; index++) {
       const art = users[index];
       let imgPath = art.profile_img
       if (imgPath) {
