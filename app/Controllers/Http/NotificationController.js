@@ -6,7 +6,7 @@ const Database = use('Database');
 class NotificationController {
 	async index({params}){
 		const usuario = await User.find(params.id)
-		return usuario.user_notifications().fetch()
+		return await usuario.user_notifications().orderBy('created_at', 'desc').fetch()
 	}
 
 	async update({request, response}){
