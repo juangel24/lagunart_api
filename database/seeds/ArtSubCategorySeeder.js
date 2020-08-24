@@ -58,10 +58,6 @@ class ArtSubCategorySeeder {
       {
         'subcategory': 'Versos',
         'art_categories_id': 2
-      },
-      {
-        'subcategory': 'Partituras',
-        'art_categories_id': 3
       }
     ])
   }

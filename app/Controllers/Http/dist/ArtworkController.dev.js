@@ -451,7 +451,7 @@ function () {
   }, {
     key: "update_image",
     value: function update_image(_ref9) {
-      var request, artwork_id, art, _request$all7, description, title, path_img, imgPath, file, base64;
+      var request, artwork_id, art, _request$all7, description, title, path_img, extension, coverImg, name, path;
 
       return regeneratorRuntime.async(function update_image$(_context9) {
         while (1) {
@@ -460,27 +460,31 @@ function () {
               request = _ref9.request;
               artwork_id = request.input('artwork_id');
               _context9.next = 4;
-              return regeneratorRuntime.awrap(Artwork.find(artwork_id.id));
+              return regeneratorRuntime.awrap(Artwork.find(artwork_id));
 
             case 4:
               art = _context9.sent;
-              _request$all7 = request.all(), description = _request$all7.description, title = _request$all7.title, path_img = _request$all7.path_img;
-              imgPath = art.path_img;
-              _context9.next = 9;
-              return regeneratorRuntime.awrap(Drive.get(imgPath));
+              _request$all7 = request.all(), description = _request$all7.description, title = _request$all7.title, path_img = _request$all7.path_img, extension = _request$all7.extension;
+              coverImg = path_img;
+              name = 'artwork' + Math.random() + '.' + extension;
+              _context9.next = 10;
+              return regeneratorRuntime.awrap(Drive.put('artwork/' + name, Buffer.from(coverImg, 'base64')));
 
-            case 9:
-              file = _context9.sent;
-              base64 = Buffer.from(file).toString('base64');
-              art.path_img = base64;
+            case 10:
+              path = 'artwork/' + name;
+              _context9.next = 13;
+              return regeneratorRuntime.awrap(Drive.get(path));
+
+            case 13:
+              art.path_img = path;
               art.title = title;
               art.description = description;
-              art.merge();
+              art.save();
               return _context9.abrupt("return", {
                 art: art
               });
 
-            case 16:
+            case 18:
             case "end":
               return _context9.stop();
           }

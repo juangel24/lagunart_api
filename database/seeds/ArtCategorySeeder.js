@@ -21,9 +21,6 @@ class ArtCategorySeeder {
       },
       {
         'category': 'Literatura'
-      },
-      {
-        'category': 'Musica'
       }
     ])
   }
