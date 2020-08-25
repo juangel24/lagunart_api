@@ -41,7 +41,7 @@ class AuthController {
     }
   }
 
-  async logout() { await auth.logout() }
+  async logout({ auth }) { await auth.logout() }
 
   async sendResetMail({ request }) {
     const email = request.input('email')
