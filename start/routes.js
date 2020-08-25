@@ -15,7 +15,7 @@ Route.get('', () => "I'm a practice :)")
 // Auth
 Route.post('join', 'AuthController.join')
 Route.post('login', 'AuthController.login')
-Route.get('logout', 'AuthController.logout').middleware('auth')
+Route.post('logout', 'AuthController.logout').middleware('auth')
 Route.post('password/reset/mail', 'AuthController.sendResetMail')
 Route.post('password/reset', 'AuthController.resetPassword')
 
