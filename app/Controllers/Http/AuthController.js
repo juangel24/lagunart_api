@@ -34,14 +34,20 @@ class AuthController {
         let file = await Drive.get(imgPath)
         let base64 = Buffer.from(file, 'base64').toString('base64')
         user.profile_img = base64
-      }else {
+      } else {
         user.profile_img = null
       }
       return this._userWithToken(auth, user)
     }
   }
 
-  async logout({ auth }) { await auth.logout() }
+  async logout({ auth, request, response }) {
+    const token = request.input('token');
+
+    await auth.revokeTokens([token], true)
+
+    response.send('successful')
+  }
 
   async sendResetMail({ request }) {
     const email = request.input('email')
@@ -108,7 +114,7 @@ class AuthController {
     await user.save()
 
     await PasswordReset.query().where('email', user.email)
-    .where('token', token).delete()
+      .where('token', token).delete()
 
     return { success: true, message: 'Contraseña cambiada con éxito' }
   }
